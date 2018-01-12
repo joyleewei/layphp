@@ -27,6 +27,7 @@ layui.use(['form','layer','jquery'],function(){
                         'icon':2,
                         'time':2000
                     });
+                    $('#code').click();
                 }
             },
             'error':function(){

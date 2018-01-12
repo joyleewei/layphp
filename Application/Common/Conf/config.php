@@ -16,5 +16,6 @@ return array(
     'DB_USER'=>'root',
     'DB_PWD'=>'root123',
     'DB_PORT'=>3306,
-    'DB_PREFIX'=>'db_'
+    'DB_PREFIX'=>'db_',
+    'WEBPATH'=>'http://www.layphp.xxmall.com'
 );

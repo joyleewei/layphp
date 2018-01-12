@@ -2,6 +2,7 @@
 namespace Admin\Controller;
 use Think\Controller;
 class PublicController extends Controller{
+    // 登录
     public function login(){
         if(IS_AJAX){
             $data = I('post.','','addslashes,htmlspecialchars');
@@ -17,6 +18,7 @@ class PublicController extends Controller{
                 $map_user['password'] = md5($data['password']);
                 $map_user['state'] = 1;
                 $user_info = M('User')->where($map_user)->find();
+                // $user_info = M('User')->where($map_user)->getField('id,username,nickname,image,sex');
                 if(!empty($user_info)){
                     unset($user_info['password']);
                     session('user_info',$user_info);
@@ -40,5 +42,11 @@ class PublicController extends Controller{
                 $this->display();
             }
         }
+    }
+
+    // 退出
+    public function logout(){
+        session('user_info',null);
+        redirect('/admin/public/login.html');
     }
 }
