@@ -13,11 +13,15 @@ layui.use(['form','layer','jquery'],function(){
             'url':url,
             'data':$post,
             'success':function(data){
-                console.log(data);
-                return false;
                 if(data.status == 1){
                     layer.msg('登陆成功，正在跳转');
                     window.location.href = '/admin/index/index';
+                }else if(data.status == 2){
+                    layer.msg(data.msg,{
+                        'icon':2,
+                        'time':2000
+                    });
+                    $('#code').click();
                 }else{
                     layer.msg(data.msg,{
                         'icon':2,
@@ -40,7 +44,6 @@ layui.use(['form','layer','jquery'],function(){
 
     $('#code').click(function(){
         var url = '/api/verify/code?t='+new Date().getTime();
-        console.log(url);
         $(this).attr('src',url);
     });
 })
