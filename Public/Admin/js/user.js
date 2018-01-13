@@ -1,4 +1,3 @@
-var areaData = address;
 var $form;
 var form;
 var $;
@@ -10,7 +9,6 @@ layui.config({
 		$ = layui.jquery;
 		$form = $('form');
 		laydate = layui.laydate;
-        loadProvince(); //加载省信息
 
     layui.upload({
     	'url' : "/api/upload/image.html?t="+new Date().getTime(),
@@ -31,11 +29,6 @@ layui.config({
 
     //添加验证规则
     form.verify({
-        oldPwd : function(value, item){
-            if(value != "123456"){
-                return "密码错误，请重新输入！";
-            }
-        },
         newPwd : function(value, item){
             if(value.length < 6){
                 return "密码长度不能小于6位";
@@ -48,87 +41,37 @@ layui.config({
         }
     })
 
-    //判断是否修改过用户信息，如果修改过则填充修改后的信息
-    if(window.sessionStorage.getItem('userInfo')){
-        var userInfo = JSON.parse(window.sessionStorage.getItem('userInfo'));
-        var citys;
-        $(".realName").val(userInfo.realName); //用户名
-        $(".userSex input[value="+userInfo.sex+"]").attr("checked","checked"); //性别
-        $(".userPhone").val(userInfo.userPhone); //手机号
-        $(".userBirthday").val(userInfo.userBirthday); //出生年月
-        $(".userAddress select[name='province']").val(userInfo.province); //省
-        //填充省份信息，同时调取市级信息列表
-        var value = userInfo.province;
-        var d = value.split('_');
-        var code = d[0];
-        var count = d[1];
-        var index = d[2];
-        if (count > 0) {
-            loadCity(areaData[index].mallCityList);
-            citys = areaData[index].mallCityList
-        } else {
-            $form.find('select[name=city]').attr("disabled","disabled");
-        }
-        $(".userAddress select[name='city']").val(userInfo.city); //市
-        //填充市级信息，同时调取区县信息列表
-        var value = userInfo.city;
-        var d = value.split('_');
-        var code = d[0];
-        var count = d[1];
-        var index = d[2];
-        if (count > 0) {
-            loadArea(citys[index].mallAreaList);
-        } else {
-            $form.find('select[name=area]').attr("disabled","disabled");
-        }
-        $(".userAddress select[name='area']").val(userInfo.area); //区
-        for(key in userInfo){
-            if(key.indexOf("like") != -1){
-                $(".userHobby input[name='"+key+"']").attr("checked","checked");
-            }
-        }
-        $(".userEmail").val(userInfo.userEmail); //用户邮箱
-        $(".myself").val(userInfo.myself); //自我评价
-        form.render();
-    }
-/*
-    //判断是否修改过头像，如果修改过则显示修改后的头像，否则显示默认头像
-    if(window.sessionStorage.getItem('userFace')){
-    	$("#userFace").attr("src",window.sessionStorage.getItem('userFace'));
-    }else{
-    	$("#userFace").attr("src","../../images/face.jpg");
-    }
-*/
-    //判断是否修改过头像，如果修改过则显示修改后的头像，否则显示默认头像
-    if(window.sessionStorage.getItem('userFace')){
-        $("#userFace").attr("src",window.sessionStorage.getItem('userFace'));
-    }
     //提交个人资料
     form.on("submit(changeUser)",function(data){
     	var index = layer.msg('提交中，请稍候',{icon: 16,time:false,shade:0.8});
-        //将填写的用户信息存到session以便下次调取
-        var key,userInfoHtml = '';
-        userInfoHtml = {
-            'realName' : $(".realName").val(),
-            'sex' : data.field.sex,
-            'userPhone' : $(".userPhone").val(),
-            'userBirthday' : $(".userBirthday").val(),
-            'province' : data.field.province,
-            'city' : data.field.city,
-            'area' : data.field.area,
-            'userEmail' : $(".userEmail").val(),
-            'myself' : $(".myself").val()
-        };
-        for(key in data.field){
-            if(key.indexOf("like") != -1){
-                userInfoHtml[key] = "on";
+    	var $post = data.field;
+        delete $post.file;
+        $.ajax({
+            'url':'/admin/user/info',
+            'type':'POST',
+            'dataType':'json',
+            'data':$post,
+            'success':function(data){
+                if(data.status == 1){
+                    layer.close(index);
+                    layer.msg(data.msg,{'icon':1});
+                    parent.$(".refresh").click();
+                    parent.$('.index_nickname').html(data.nickname);
+                    parent.$('.index_image').attr({'src':data.image});
+                }else{
+                    layer.close(index);
+                    layer.msg('接口发生错误，请稍后重试',{'icon':2});
+                }
+            },
+            'error':function(XMLHttpRequest, textStatus){
+                var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                xmlhttp.abort();
+                console.log(textStatus);
+                layer.close(index);
+                layer.msg('接口发生错误，请稍后重试',{'icon':2});
             }
-        }
-        window.sessionStorage.setItem("userInfo",JSON.stringify(userInfoHtml));
-        setTimeout(function(){
-            layer.close(index);
-            layer.msg("提交成功！");
-        },2000);
+
+        });
     	return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
     })
 
@@ -143,59 +86,84 @@ layui.config({
     	return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
     })
 
-})
-
-//加载省数据
-function loadProvince() {
-    var proHtml = '';
-    for (var i = 0; i < areaData.length; i++) {
-        proHtml += '<option value="' + areaData[i].provinceCode + '_' + areaData[i].mallCityList.length + '_' + i + '">' + areaData[i].provinceName + '</option>';
-    }
-    //初始化省数据
-    $form.find('select[name=province]').append(proHtml);
-    form.render();
     form.on('select(province)', function(data) {
-        $form.find('select[name=area]').html('<option value="">请选择县/区</option>');
+        // 县/区先清零
+        $form.find('select[name=area]').html('<option value="">请选择县/区</option>').attr({'disabled':'disabled'});
         var value = data.value;
-        var d = value.split('_');
-        var code = d[0];
-        var count = d[1];
-        var index = d[2];
-        if (count > 0) {
-            loadCity(areaData[index].mallCityList);
-        } else {
-            $form.find('select[name=city]').attr("disabled","disabled");
-        }
+        loadCity(value);
+        return false;
     });
-}
-//加载市数据
-function loadCity(citys) {
-    var cityHtml = '<option value="">请选择市</option>';
-    for (var i = 0; i < citys.length; i++) {
-        cityHtml += '<option value="' + citys[i].cityCode + '_' + citys[i].mallAreaList.length + '_' + i + '">' + citys[i].cityName + '</option>';
+
+    function loadCity(id){
+        var $str = '<option value="">请选择市</option>';
+        $form.find('select[name=city]').html($str);
+        var url = '/api/city/get.html?t='+new Date().getTime();
+        $.ajax({
+            'url':url,
+            'type':'POST',
+            'dataType':'json',
+            'data':{'areaid':id},
+            'success':function(data){
+                if(data.status == 1){
+                    if(data.count > 0){
+                        var cityHtml = '<option value="">请选择市</option>';
+                        $.each(data.area,function(index,elem){
+                            cityHtml += '<option value="'+index+'">'+elem+'</option>';
+                        });
+                        $form.find('select[name=city]').html(cityHtml);
+                        form.render('select');
+                        form.on('select(city)', function(data) {
+                            var value = data.value;
+                            loadArea(value);
+                            return false;
+                        });
+                    }else{
+                        $form.find('select[name=city]').attr({'disabled':'disabled'});
+                    }
+                }else{
+                    layer.msg('接口发生错误，请稍后重试',{'icon':2});
+                }
+            },
+            'error':function(XMLHttpRequest, textStatus){
+                var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                xmlhttp.abort();
+                console.log(textStatus);
+                layer.msg('接口发生错误，请稍后重试',{'icon':2});
+            }
+        });
+        return false;
     }
-    $form.find('select[name=city]').html(cityHtml).removeAttr("disabled");
-    form.render();
-    form.on('select(city)', function(data) {
-        var value = data.value;
-        var d = value.split('_');
-        var code = d[0];
-        var count = d[1];
-        var index = d[2];
-        if (count > 0) {
-            loadArea(citys[index].mallAreaList);
-        } else {
-            $form.find('select[name=area]').attr("disabled","disabled");
-        }
-    });
-}
-//加载县/区数据
-function loadArea(areas) {
-    var areaHtml = '<option value="">请选择县/区</option>';
-    for (var i = 0; i < areas.length; i++) {
-        areaHtml += '<option value="' + areas[i].areaCode + '">' + areas[i].areaName + '</option>';
+
+    function loadArea(id){
+        var $str = '<option value="">请选择县/区</option>';
+        var url = '/api/city/get.html?t='+new Date().getTime();
+        $form.find('select[name=area]').html($str).removeAttr('disabled');
+        $.ajax({
+            'url':url,
+            'type':'POST',
+            'dataType':'json',
+            'data':{'areaid':id},
+            'success':function(data){
+                if(data.status==1){
+                    if(data.count > 0){
+                        var areaHtml = '<option value="">请选择县/区</option>';
+                        $.each(data.area,function(index,elem){
+                            areaHtml += '<option value="'+index+'">'+elem+'</option>';
+                        })
+                        $form.find('select[name=area]').html(areaHtml);
+                        form.render('select');
+                    }else{
+                        $form.find('select[name=area]').attr({'disabled':'disabled'});
+                    }
+                }
+            },
+            'error':function(XMLHttpRequest, textStatus){
+                var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                xmlhttp.abort();
+                console.log(textStatus);
+                layer.msg('接口发生错误，请稍后重试',{'icon':2});
+            }
+        });
+        return false;
     }
-    $form.find('select[name=area]').html(areaHtml).removeAttr("disabled");
-    form.render();
-    form.on('select(area)', function(data) {});
-}
+})

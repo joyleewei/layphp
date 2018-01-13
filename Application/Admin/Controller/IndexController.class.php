@@ -2,8 +2,15 @@
 namespace Admin\Controller;
 use Common\Controller\AdminbaseController;
 class IndexController extends AdminbaseController {
+    private $user_model;
+    public function __construct(){
+        parent::__construct();
+        $this->user_model = D('Admin/user');
+    }
     public function index(){
-        $user_info = $_SESSION['user_info'];
+        $user_id = $_SESSION['user_info']['id'];
+        $map['id'] = $user_id;
+        $user_info = $this->user_model->where($map)->find();
         $this->assign('user_info',$user_info);
         $this->display();
     }

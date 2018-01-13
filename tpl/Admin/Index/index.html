@@ -30,19 +30,19 @@
             <ul class="layui-nav top_menu">
                 <li class="layui-nav-item" mobile>
                     <!--修改密码-->
-                    <a href="javascript:;" class="mobileAddTab" data-url="<{:U('admin/public/changepwd')}>"><i class="iconfont icon-shezhi1" data-icon="icon-shezhi1"></i><cite>设置</cite></a>
+                    <a href="javascript:;" class="mobileAddTab" data-url="<{:U('admin/user/changepwd')}>"><i class="iconfont icon-shezhi1" data-icon="icon-shezhi1"></i><cite>修改密码</cite></a>
                 </li>
                 <li class="layui-nav-item" mobile>
                     <a href="<{:U('admin/public/logout')}>" class="signOut"><i class="iconfont icon-loginout"></i> 退出</a>
                 </li>
                 <li class="layui-nav-item" pc>
                     <a href="javascript:;">
-                        <img src="<{$user_info['image']}>" class="layui-circle" width="35" height="35">
-                        <cite><{$user_info['nickname']}></cite>
+                        <img src="<{$user_info['image']}>" class="layui-circle index_image" width="35" height="35">
+                        <cite class="index_nickname"><{$user_info['nickname']}></cite>
                     </a>
                     <dl class="layui-nav-child">
                         <dd><a href="javascript:;" data-url="<{:U('admin/user/info')}>"><i class="iconfont icon-zhanghu" data-icon="icon-zhanghu"></i><cite>个人资料</cite></a></dd>
-                        <dd><a href="javascript:;" data-url="<{:U('admin/public/changepwd')}>"><i class="iconfont icon-shezhi1" data-icon="icon-shezhi1"></i><cite>修改密码</cite></a></dd>
+                        <dd><a href="javascript:;" data-url="<{:U('admin/user/changepwd')}>"><i class="iconfont icon-shezhi1" data-icon="icon-shezhi1"></i><cite>修改密码</cite></a></dd>
                         <dd><a href="<{:U('admin/public/logout')}>" class="signOut"><i class="iconfont icon-loginout"></i><cite>退出</cite></a></dd>
                     </dl>
                 </li>
@@ -52,8 +52,8 @@
     <!-- 左侧导航 -->
     <div class="layui-side layui-bg-black">
         <div class="user-photo">
-            <a class="img" title="我的头像" ><img src="<{$user_info['image']}>"></a>
-            <p>你好！<span class="userName"><{$user_info['nickname']}></span>, 欢迎登录</p>
+            <a class="img" title="我的头像" ><img class="index_image" src="<{$user_info['image']}>"></a>
+            <p>你好！<span class="userName index_nickname"><{$user_info['nickname']}></span>, 欢迎登录</p>
         </div>
         <div class="navBar layui-side-scroll"></div>
     </div>
