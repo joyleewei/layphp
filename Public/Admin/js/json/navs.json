@@ -36,6 +36,19 @@
 			"href" : "page/login/login.html",
 			"spread" : false,
 			"target" : "_blank"
+		},
+		{
+			"title" : "菜单管理",
+			"icon" : "icon-text",
+			"href" : "/admin/nav/index.html",
+			"spread" : false
+		},
+		{
+			"title" : "添加菜单",
+			"icon" : "&#xe654;",
+			"href" : "/admin/nav/add.html",
+			"spread" : false
 		}
+
 	]
 }]

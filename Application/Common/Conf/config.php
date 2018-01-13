@@ -17,5 +17,7 @@ return array(
     'DB_PWD'=>'root123',
     'DB_PORT'=>3306,
     'DB_PREFIX'=>'db_',
-    'WEBPATH'=>'http://www.layphp.xxmall.com'
+    'WEBPATH'=>'http://www.layphp.xxmall.com',
+    # 权限管理用户表
+    'AUTH_USER' =>'user'
 );
