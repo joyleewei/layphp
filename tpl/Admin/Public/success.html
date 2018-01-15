@@ -10,6 +10,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="format-detection" content="telephone=no">
     <link rel="stylesheet" href="__PUBLIC__/static/layui/css/layui.css" media="all" />
+    <script type="text/javascript" src="__PUBLIC__/static/layui/layui.js"></script>
 </head>
 <body class="childrenBody">
 <div style="text-align: center; padding:11% 0;">
@@ -32,5 +33,23 @@
         }, 1000);
     })();
 </script>
+
+<script type="text/javascript">
+    layui.use('layer',function(){
+        var layer = parent.layer === undefined ? layui.layer : parent.layer;
+        layer.closeAll();
+
+        var wait = document.getElementById('wait'),href = document.getElementById('href').href;
+        var interval = setInterval(function(){
+            var time = --wait.innerHTML;
+            if(time <= 0) {
+                location.href = href;
+                clearInterval(interval);
+            };
+        }, 1000);
+
+    });
+</script>
+
 </body>
 </html>

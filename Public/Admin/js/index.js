@@ -5,10 +5,11 @@ layui.config({
 	var form = layui.form(),
 		layer = layui.layer,
 		element = layui.element();
+	var url = '/admin/index/nav.html?t'+ new Date().getTime();
 		$ = layui.jquery;
 		tab = layui.bodyTab({
 			openTabNum : "50",  //最大可打开窗口数量
-			url : "/Public/Admin/js/json/navs.json" //获取菜单json地址
+			url :url //获取菜单json地址
 		});
 
 	//更换皮肤
@@ -24,6 +25,7 @@ layui.config({
 			}
 		}
 	}
+	/*
 	skins();
 	$(".changeSkin").click(function(){
 		layer.open({
@@ -123,13 +125,7 @@ layui.config({
 			}
 		})
 	})
-
-	//退出
-	$(".signOut").click(function(){
-		window.sessionStorage.removeItem("menu");
-		menu = [];
-		window.sessionStorage.removeItem("curmenu");
-	})
+    */
 
 	//隐藏左侧导航
 	$(".hideMenu").click(function(){

@@ -6,7 +6,3 @@ function pr($data){
     echo '</pre>';
     echo '<br />';
 }
-
-function sub($value){
-    return substr($value,3);
-}

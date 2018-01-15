@@ -6,6 +6,7 @@ class IndexController extends AdminbaseController {
     public function __construct(){
         parent::__construct();
         $this->user_model = D('Admin/user');
+        $this->nav_model = D('Admin/AdminNav');
     }
     public function index(){
         $user_id = $_SESSION['user_info']['id'];
@@ -19,31 +20,37 @@ class IndexController extends AdminbaseController {
         $this->display();
     }
 
-    public function area(){
-        for($i=0;$i<30;$i++){
-            $start = $i*500;
-            $end = $start + 500;
-            $map['tree'] = '';
-            $area = M('area')->where($map)->limit($start,$end)->getField('id,position');
-            $data = array();
-            if(!empty($area)){
-                foreach($area as $k=>$v){
-                    if(!empty($v)){
-                        $value = explode(' ',$v);
-                        $str = join(',',array_map('sub',$value));
-                        if(empty($str)){
-                            $str = '0';
-                        }
-                        $map_area['id'] = $k;
-                        M('area')->where($map_area)->setField('tree',$str);
-                        unset($map_area);
-                        echo M('area')->getLastSql().'<br />';
-                    }
-
+    public function nav(){
+        $nav_data=$this->nav_model->getTreeData('level','listorder,id');
+        $list = array();
+        $arr = array();
+        foreach($nav_data as $k=>$v){
+            if(!empty($v['_data'])){
+                $list['href'] = '';
+                $list['href'] = $v['mca'].'.html';
+                $list['title'] = $v['name'];
+                $list['icon'] = $v['icon'];
+                $list['spread'] = false;
+                $list['children'] = array();
+                foreach($v['_data'] as $key=>$value){
+                    $child['title'] = $value['name'];
+                    $child['icon'] = $value['icon'];
+                    $child['href'] = $value['mca'].'.html';
+                    $child['spread'] = 'false';
+                    array_push($list['children'],$child);
                 }
+                array_push($arr,$list);
+                unset($list);
+            }else{
+                $list['href'] = $v['mca'].'.html';
+                $list['title'] = $v['name'];
+                $list['icon'] = $v['icon'];
+                $list['spread'] = false;
+                array_push($arr,$list);
+                unset($list);
             }
-
         }
+        echo json_encode($arr,true);
 
     }
 

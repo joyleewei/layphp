@@ -14,10 +14,11 @@ class AdminNavModel extends Model{
     );
 
     //验证action是否重复添加---[没整明白语法]
-    public function checkAction($data) {
+    public function checkAction($data){
         //检查是否重复添加
-        $find = $this->where($data)->find();
-        if ($find) {
+        $map['mca'] = '/'.ucfirst(trim($data['module'])).'/'.ucfirst(trim($data['controller'])).'/'.lcfirst(trim($data['action']));
+        $find = $this->where($map)->find();
+        if($find){
             return false;
         }
         return true;
@@ -28,11 +29,53 @@ class AdminNavModel extends Model{
         //检查是否重复添加
         $id=$data['id'];
         unset($data['id']);
-        $find = $this->field('id')->where($data)->find();
+        $map['mca'] = '/'.ucfirst(trim($data['module'])).'/'.ucfirst(trim($data['controller'])).'/'.lcfirst(trim($data['action']));
+        $find = $this->field('id')->where($map)->find();
         if (isset($find['id']) && $find['id']!=$id) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 获取全部菜单
+     * @param  string $type tree获取树形结构 level获取层级结构
+     * @return array       	结构数据
+     */
+    public function getTreeData($type='tree',$order='',$map){
+        // 判断是否需要排序
+        $map_data = array();
+        if(!empty($map)){
+            $map_data = $map;
+        }
+        if(empty($order)){
+            $data=$this->where($map_data)->select();
+        }else{
+            $data=$this->where($map_data)->order('listorder is null,id is null,'.$order)->select();
+        }
+        // 获取树形或者结构数据
+        if($type=='tree'){
+            $data=\Org\Nx\Data::tree($data,'name','id','pid');
+        }elseif($type="level"){
+            $data=\Org\Nx\Data::channelLevel($data,0,'&nbsp;','id');
+            // 显示有权限的菜单
+            /*
+            $auth=new \Think\Auth();
+            foreach ($data as $k => $v) {
+                if ($auth->check($v['mca'],$_SESSION['user']['id'])) {
+                    foreach ($v['_data'] as $m => $n) {
+                        if(!$auth->check($n['mca'],$_SESSION['user']['id'])){
+                            unset($data[$k]['_data'][$m]);
+                        }
+                    }
+                }else{
+                    // 删除无权限的菜单
+                    unset($data[$k]);
+                }
+            }
+            */
+        }
+        return $data;
     }
 
 }

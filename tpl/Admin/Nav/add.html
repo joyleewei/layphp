@@ -25,7 +25,7 @@
                         <option value="0">作为第一级菜单</option>
                         <if condition="!empty($first_nav)">
                             <volist name="first_nav" id="vo">
-                                <option value="<{$key}>"><{$vo}></option>
+                                <option value="<{$key}>" <if condition="$pid eq $key">selected='selected'</if>  ><{$vo}></option>
                             </volist>
                         </if>
                     </select>
@@ -62,18 +62,10 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">图标</label>
                 <div class="layui-input-inline">
-                    <input type="text" class="layui-input" name="icon"  placeholder="">
+                    <input type="text" class="layui-input" name="icon" value="icon-viewmore"  placeholder="请输入图标">
                 </div>
                 <div class="layui-form-mid layui-word-aux">
-                    <a href="http://www.layui.com/v1/doc/element/icon.html" target="_blank">href=:选择图标 [默认为: @#xe602;] @需要替换为&</a>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">是否左侧显示</label>
-                <div class="layui-input-block">
-                    <input type="radio" name="type" value="1" title="显示" checked="checked" />
-                    <input type="radio" name="type" value="2" title="隐藏">
+                    <a href="http://www.iconfont.cn" target="_blank">href=:选择图标 </a>[默认为:icon-viewmore]
                 </div>
             </div>
 
