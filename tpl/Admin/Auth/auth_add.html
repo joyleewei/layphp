@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>菜单添加--layphp后台管理模板</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="format-detection" content="telephone=no">
+        <link rel="icon" href="/favicon.ico">
+        <link rel="stylesheet" href="__PUBLIC__/static/layui/css/layui.css" media="all" />
+        <script type="text/javascript" src="__PUBLIC__/static/layui/layui.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/Admin/js/navAdd.js"></script>
+    </head>
+
+    <body class="childrenBody">
+        <form class="layui-form">
+            <div class="layui-inline">
+                <label class="layui-form-label">上级菜单</label>
+                <div class="layui-input-inline">
+                    <select name="pid" class="newsLook" lay-filter="browseLook">
+                        <option value="0">作为第一级菜单</option>
+                        <if condition="!empty($first_nav)">
+                            <volist name="first_nav" id="vo">
+                                <option value="<{$key}>" <if condition="$pid eq $key">selected='selected'</if>  ><{$vo}></option>
+                            </volist>
+                        </if>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="name" required lay-verify="required" placeholder="请输入菜单名称">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">模块名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="module" required lay-verify="required" placeholder="请输入模块名称">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">控制器名</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="controller" required lay-verify="required" placeholder="请输入控制器名称">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">方法名</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="action" required lay-verify="required" placeholder="请输入方法名">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">图标</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="icon"  placeholder="">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <a href="http://www.layui.com/v1/doc/element/icon.html" target="_blank">href=:选择图标 [默认为: @#xe602;] @需要替换为&</a>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否左侧显示</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="type" value="1" title="显示" checked="checked" />
+                    <input type="radio" name="type" value="2" title="隐藏">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单备注</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入菜单备注" name="remark" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序值</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" value="1" name="listorder"  placeholder="请输入排序值">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="addNav">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </form>
+    </body>
+</html>
