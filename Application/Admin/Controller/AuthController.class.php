@@ -304,6 +304,30 @@ class AuthController extends AdminbaseController{
         echo json_encode($res,true);
         exit();
     }
+    // 分配权限
+    public function group_assign(){
+        if(IS_POST){
+
+        }else{
+            $id = I('get.id',0,'intval');
+            if(!empty($id)){
+                $map_group['id'] = $id;
+                $group_info = $this->auth_group_model->where($map_group)->find();
+                if(!empty($group_info)){
+                    $group_rule = explode(',',$group_info['rule']);
+                    $rule_list = $this->auth_rule_model->getTreeData('level','id','title','id','pid');
+                    $this->assign('group_info',$group_info);
+                    $this->assign('group_rule',$group_rule);
+                    $this->assign('rule_list',$rule_list);
+                    $this->display();
+                }else{
+                    $this->error('您好，该用户组不存在,请确认后重试',U('/admin/auth/group'));
+                }
+            }else{
+                $this->error('您好，该用户组不存在',U('/admin/auth/group'));
+            }
+        }
+    }
 
     // 管理员列表
     public function user(){

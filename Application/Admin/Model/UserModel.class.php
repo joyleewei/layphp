@@ -10,4 +10,5 @@ class UserModel extends Model{
         array('phone','require','请填写用户电话号码'),
         array('email','require','请填写用户邮箱')
     );
+
 }

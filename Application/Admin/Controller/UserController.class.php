@@ -8,7 +8,10 @@ class UserController extends AdminbaseController{
         parent::__construct();
         $this->user_model = D('Admin/user');
         $this->area_model = M('Area');
+        $this->auth_group_model = D('Admin/AuthGroup');
+        $this->auth_group_access_model = D('Admin/AuthGroupAccess');
     }
+    // 个人中心和修改信息。
     public function info(){
         if(IS_POST){
             $data = $this->user_model->create();
@@ -17,6 +20,18 @@ class UserController extends AdminbaseController{
                 $data['birth'] = strtotime($data['birth']);
                 $save = $this->user_model->save($data);
                 if(!empty($save)){
+                    /*
+                    # 用户组
+                    $map_auth_group['uid'] = $data['id'];
+                    $this->auth_group_access_model->where($map_auth_group)->delete();
+                    $group = I('post.group');
+                    foreach($group as $k=>$v){
+                        $data_group['uid'] = $data['id'];
+                        $data_group['group_id'] = $v;
+                        $this->auth_group_access_model->add($data_group);
+                        unset($data_group);
+                    }
+                    */
                     $res = array(
                         'status'=>1,
                         'msg'=>'您好，修改成功',
@@ -39,10 +54,18 @@ class UserController extends AdminbaseController{
             echo json_encode($res,true);
             exit();
         }else{
-            $user_id = $_SESSION['user_info']['id'];
+            $user_id  = I('get.id',0,'intval');
+            if(empty($user_id)){
+                $user_id = $_SESSION['user_info']['id'];
+            }
             $map['id'] = $user_id;
             $map['state'] = 1;
             $user_info = $this->user_model->where($map)->find();
+            // 获取用户的所属组id
+            $gid = $this->auth_group_access_model->get_gid($user_id);
+            // 网站用户组信息
+            $map_group['id'] = array('in',$gid);
+            $group_info = $this->auth_group_model->where($map_group)->getField('id,title');
             try{
                 $redis = new \Redis();
                 $res = $redis->connect('127.0.0.1',6379);
@@ -84,6 +107,7 @@ class UserController extends AdminbaseController{
             }
 
             $this->assign('user_info',$user_info);
+            $this->assign('group_info',$group_info);
             $this->assign('province',$province);
             $this->display();
         }
@@ -133,7 +157,10 @@ class UserController extends AdminbaseController{
             echo json_encode($res,true);
             exit();
         }else{
-            $user_id = $_SESSION['user_info']['id'];
+            $user_id  = I('get.id',0,'intval');
+            if(empty($user_id)){
+                $user_id = $_SESSION['user_info']['id'];
+            }
             $map['id'] = $user_id;
             $map['state'] = 1;
             $user_info = $this->user_model->where($map)->find();
@@ -146,11 +173,4 @@ class UserController extends AdminbaseController{
         }
     }
 
-    public function suc(){
-        $this->success('成功',U('admin/index/index'));
-    }
-
-    public function err(){
-        $this->error('失败',U('admin/index/index'));
-    }
 }

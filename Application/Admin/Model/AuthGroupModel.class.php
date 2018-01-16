@@ -7,4 +7,10 @@ class AuthGroupModel extends Model{
         array('title', 'require', '用户组名称不能为空！'),
 
     );
+
+    public function get_group(){
+        $map['status'] = 1;
+        $group = $this->where($map)->getField('id,title');
+        return $group;
+    }
 }

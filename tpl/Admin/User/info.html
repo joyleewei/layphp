@@ -26,14 +26,19 @@
                     </div>
                 </div>
                 <!-- 权限管理还没有加进来 -->
-                <!--
                 <div class="layui-form-item">
                     <label class="layui-form-label">用户组</label>
                     <div class="layui-input-block">
-                        <input type="text" value="超级管理员" disabled class="layui-input layui-disabled">
+                        <if condition="!empty($group_info)">
+                            <volist name="group_info" id="vo">
+                                <span  class="layui-btn layui-btn-primary" ><{$vo}></span>
+                            </volist>
+                        <else />
+                            <span class="layui-btn layui-btn-warm">暂未分配用户组</span>
+                        </if>
                     </div>
                 </div>
-                -->
+
                 <div class="layui-form-item">
                     <label class="layui-form-label">昵称</label>
                     <div class="layui-input-block">
