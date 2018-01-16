@@ -45,7 +45,7 @@
                     <td><{$vo['title']}></td>
                     <td><{$vo['remark']|default=''}></td>
                     <td>
-                        <input type="checkbox" name="show" lay-skin="switch" lay-text="启用|禁用" lay-filter="isShow" checked />
+                        <input type="checkbox" name="show" data-id="<{$vo['id']}>" lay-skin="switch" lay-text="启用|禁用" lay-filter="isShow" checked />
                     </td>
                     <td>
                         <a class="layui-btn layui-btn-mini groupEdit_btn" data-id="<{$vo['id']}>"><i class="layui-icon">&#xe642;</i>编辑</a>

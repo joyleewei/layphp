@@ -262,6 +262,48 @@ class AuthController extends AdminbaseController{
         echo json_encode($res,true);
         exit();
     }
+    // 用户组的启用/禁用
+    public function group_isshow(){
+        if(IS_POST){
+            $id = I('post.id',0,'intval');
+            $status = I('post.status',1,'intval');
+            if(!empty($id)){
+                $map_group['id'] = $id;
+                $count = $this->auth_group_model->where($map_group)->count();
+                if($count > 0){
+                    $show_res = $this->auth_group_model->where($map_group)->setField('status',$status);
+                    if(!empty($show_res)){
+                        $res = array(
+                            'status'=>1,
+                            'msg'=>'您好，修改成功。'
+                        );
+                    }else{
+                        $res = array(
+                            'status'=>2,
+                            'msg'=>'您好，修改失败，请稍后重试。'
+                        );
+                    }
+                }else{
+                    $res = array(
+                        'status'=>0,
+                        'msg'=>'您好，请用户组不存在，请确认后重试。'
+                    );
+                }
+            }else{
+                $res = array(
+                    'status'=>0,
+                    'msg'=>'您好，请选择需要改变的用户组。'
+                );
+            }
+        }else{
+            $res = array(
+                'status'=>0,
+                'msg'=>'您好，操作失败，请确认后重试'
+            );
+        }
+        echo json_encode($res,true);
+        exit();
+    }
 
     // 管理员列表
     public function user(){
