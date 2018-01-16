@@ -46,7 +46,13 @@
                             <input style="text-align:center;padding:0px;" type="text" class="layui-input layui-sort" data-id="<{$vo['id']}>" value="<{$vo['listorder']}>">
                         </td>
                         <td style="text-align:center;"><{$vo['id']}></td>
-                        <td><{$vo['_name']}></td>
+                        <td>
+                            <if condition="$vo['_level'] eq 1">
+                                <i class="layui-icon" style="font-size: 6px; color:#fa8b27">&#xe617;</i><{$vo['_name']}>
+                            <else />
+                                <{$vo['_name']}>
+                            </if>
+                        </td>
                         <td><{$vo['mca']}></td>
                         <td>
                             <if condition="$vo['_level'] eq 1">

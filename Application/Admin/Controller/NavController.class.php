@@ -20,6 +20,7 @@ class NavController extends AdminbaseController{
         if(IS_POST){
             $data =  $this->nav_model->create();
             if(!empty($data)){
+                $data['icon'] = htmlspecialchars_decode($data['icon']);
                 $data['module'] = ucfirst(trim($data['module']));
                 $data['controller'] = ucfirst(trim($data['controller']));
                 $data['action'] = lcfirst(trim($data['action']));
@@ -64,6 +65,7 @@ class NavController extends AdminbaseController{
         if(IS_POST){
             $data = $this->nav_model->create();
             if(!empty($data)){
+                $data['icon'] = htmlspecialchars_decode($data['icon']);
                 $data['module'] = ucfirst(trim($data['module']));
                 $data['controller'] = ucfirst(trim($data['controller']));
                 $data['action'] = lcfirst(trim($data['action']));
@@ -112,8 +114,6 @@ class NavController extends AdminbaseController{
                 $this->error('您好，该菜单不存在，请确认后重试!!!',U('admin/nav/index'));
             }
         }
-
-
     }
 
     public function delete(){

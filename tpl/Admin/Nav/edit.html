@@ -12,82 +12,81 @@
         <link rel="icon" href="/favicon.ico">
         <link rel="stylesheet" href="__PUBLIC__/static/layui/css/layui.css" media="all" />
         <script type="text/javascript" src="__PUBLIC__/static/layui/layui.js"></script>
-        <script type="text/javascript" src="__PUBLIC__/Admin/js/navAdd.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/Admin/js/navList.js"></script>
     </head>
+    <body class="childrenBody">
+        <form class="layui-form">
+            <div class="layui-inline">
+                <label class="layui-form-label">上级菜单</label>
+                <div class="layui-input-inline">
+                    <select name="pid" class="newsLook" lay-filter="browseLook">
+                        <option value="0">作为第一级菜单</option>
+                        <if condition="!empty($first_nav)">
+                            <volist name="first_nav" id="vo">
+                                <option value="<{$key}>" <if condition="$nav_info['pid'] eq $key">selected='selected'</if>  ><{$vo}></option>
+                            </volist>
+                        </if>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单名称</label>
+                <div class="layui-input-inline">
+                    <input type="hidden" value="<{$nav_info['id']}>" name="id" />
+                    <input type="text" class="layui-input" name="name" value="<{$nav_info['name']}>" required lay-verify="required" placeholder="请输入菜单名称" />
+                </div>
+            </div>
 
-<body class="childrenBody">
-    <form class="layui-form">
-        <div class="layui-inline">
-            <label class="layui-form-label">上级菜单</label>
-            <div class="layui-input-inline">
-                <select name="pid" class="newsLook" lay-filter="browseLook">
-                    <option value="0">作为第一级菜单</option>
-                    <if condition="!empty($first_nav)">
-                        <volist name="first_nav" id="vo">
-                            <option value="<{$key}>" <if condition="$nav_info['pid'] eq $key">selected='selected'</if>  ><{$vo}></option>
-                        </volist>
-                    </if>
-                </select>
+            <div class="layui-form-item">
+                <label class="layui-form-label">模块名称</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="module" value="<{$nav_info['module']}>" required lay-verify="required" placeholder="请输入模块名称">
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">菜单名称</label>
-            <div class="layui-input-inline">
-                <input type="hidden" value="<{$nav_info['id']}>" name="id" />
-                <input type="text" class="layui-input" name="name" value="<{$nav_info['name']}>" required lay-verify="required" placeholder="请输入菜单名称" />
-            </div>
-        </div>
 
-        <div class="layui-form-item">
-            <label class="layui-form-label">模块名称</label>
-            <div class="layui-input-inline">
-                <input type="text" class="layui-input" name="module" value="<{$nav_info['module']}>" required lay-verify="required" placeholder="请输入模块名称">
+            <div class="layui-form-item">
+                <label class="layui-form-label">控制器名</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="controller" value="<{$nav_info['controller']}>" required lay-verify="required" placeholder="请输入控制器名称">
+                </div>
             </div>
-        </div>
 
-        <div class="layui-form-item">
-            <label class="layui-form-label">控制器名</label>
-            <div class="layui-input-inline">
-                <input type="text" class="layui-input" name="controller" value="<{$nav_info['controller']}>" required lay-verify="required" placeholder="请输入控制器名称">
+            <div class="layui-form-item">
+                <label class="layui-form-label">方法名</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="action" value="<{$nav_info['action']}>" required lay-verify="required" placeholder="请输入方法名">
+                </div>
             </div>
-        </div>
 
-        <div class="layui-form-item">
-            <label class="layui-form-label">方法名</label>
-            <div class="layui-input-inline">
-                <input type="text" class="layui-input" name="action" value="<{$nav_info['action']}>" required lay-verify="required" placeholder="请输入方法名">
+            <div class="layui-form-item">
+                <label class="layui-form-label">图标</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="icon" value="<{$nav_info['icon']}>"  placeholder="请输入图标">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <a href="http://www.iconfont.cn" target="_blank">href=:选择图标 </a>[默认为:icon-viewmore]
+                </div>
             </div>
-        </div>
 
-        <div class="layui-form-item">
-            <label class="layui-form-label">图标</label>
-            <div class="layui-input-inline">
-                <input type="text" class="layui-input" name="icon" value="<{$nav_info['icon']}>"  placeholder="请输入图标">
+            <div class="layui-form-item">
+                <label class="layui-form-label">菜单备注</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入菜单备注" name="remark" class="layui-textarea"><{$nav_info['remark']}></textarea>
+                </div>
             </div>
-            <div class="layui-form-mid layui-word-aux">
-                <a href="http://www.iconfont.cn" target="_blank">href=:选择图标 </a>[默认为:icon-viewmore]
+            <div class="layui-form-item">
+                <label class="layui-form-label">排序值</label>
+                <div class="layui-input-inline">
+                    <input type="text" class="layui-input" name="listorder" value="<{$nav_info['listorder']}>"  placeholder="请输入排序值">
+                </div>
             </div>
-        </div>
 
-        <div class="layui-form-item">
-            <label class="layui-form-label">菜单备注</label>
-            <div class="layui-input-block">
-                <textarea placeholder="请输入菜单备注" name="remark" class="layui-textarea"><{$nav_info['remark']}></textarea>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="editNav">立即提交</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
             </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">排序值</label>
-            <div class="layui-input-inline">
-                <input type="text" class="layui-input" value="1" name="listorder" value="<{$nav_info['listorder']}>"  placeholder="请输入排序值">
-            </div>
-        </div>
-
-        <div class="layui-form-item">
-            <div class="layui-input-block">
-                <button class="layui-btn" lay-submit="" lay-filter="editNav">立即提交</button>
-                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-            </div>
-        </div>
-    </form>
-</body>
+        </form>
+    </body>
 </html>
