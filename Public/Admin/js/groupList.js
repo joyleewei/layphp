@@ -160,6 +160,12 @@ layui.config({
     form.on("switch(isShow)",function(data){
         var index = top.layer.msg('状态修改中，请稍候',{icon: 16,time:false,shade:0.8});
         var $id = $(this).attr('data-id');
+        if(data.elem.checked){
+            var $status = 1;
+        }else{
+            var $status = 2;
+        }
+        console.log($status);
         if($id){
             var url = '/admin/auth/group_isshow.html?t='+new Date().getTime();
             var $status = 1;
@@ -190,11 +196,7 @@ layui.config({
                     parent.location.reload();
                 }
             });
-            // ajax 请求失败，或者后端返回状态为error ，执行如下操作。ajax 请求成功，不用管状态。
-            /*
-            $(this).prop("checked",!this.checked);
-            form.render();
-            */
+            return false;
         }else{
             layer.msg('您好，操作失败，请确认后重试',{icon: 16,time:false,shade:0.8});
         }
