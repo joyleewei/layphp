@@ -1,7 +1,7 @@
 <?php
 return array(
 	//'配置项'=>'配置值'
-    'MODULE_DENY_LIST'=>array('Common'),
+    'MODULE_DENY_LIST'=>array('Common','Runtime'),
     'MODULE_ALLOW_LIST'=>array('Home','Admin','Api'),
     'TMPL_L_DELIM'=>'<{',
     'TMPL_R_DELIM'=>'}>',
