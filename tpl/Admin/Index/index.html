@@ -30,10 +30,10 @@
             <ul class="layui-nav top_menu">
                 <li class="layui-nav-item" mobile>
                     <!--修改密码-->
-                    <a href="javascript:;" class="mobileAddTab" data-url="<{:U('admin/user/changepwd')}>"><i class="iconfont icon-shezhi1" data-icon="icon-shezhi1"></i><cite>修改密码</cite></a>
+                    <a href="javascript:;" class="mobileAddTab" data-url="<{:U('admin/user/changepwd')}>"><i class="iconfont icon-edit" data-icon="icon-edit"></i><cite>修改密码</cite></a>
                 </li>
                 <li class="layui-nav-item" mobile>
-                    <a href="<{:U('admin/public/logout')}>" class="signOut"><i class="iconfont icon-loginout"></i> 退出</a>
+                    <a href="<{:U('admin/public/logout')}>" class="signOut"><i class="iconfont icon-close"></i> 退出</a>
                 </li>
                 <li class="layui-nav-item" pc>
                     <a href="javascript:;">
@@ -41,9 +41,9 @@
                         <cite class="index_nickname"><{$user_info['nickname']}></cite>
                     </a>
                     <dl class="layui-nav-child">
-                        <dd><a href="javascript:;" data-url="<{:U('admin/user/info')}>"><i class="iconfont icon-zhanghu" data-icon="icon-zhanghu"></i><cite>个人资料</cite></a></dd>
-                        <dd><a href="javascript:;" data-url="<{:U('admin/user/changepwd')}>"><i class="iconfont icon-shezhi1" data-icon="icon-shezhi1"></i><cite>修改密码</cite></a></dd>
-                        <dd><a href="<{:U('admin/public/logout')}>" class="signOut"><i class="iconfont icon-loginout"></i><cite>退出</cite></a></dd>
+                        <dd><a href="javascript:;" data-url="<{:U('admin/user/info')}>"><i class="iconfont icon-bussinesscard" data-icon="icon-bussinesscard"></i><cite>个人中心</cite></a></dd>
+                        <dd><a href="javascript:;" data-url="<{:U('admin/user/changepwd')}>"><i class="iconfont icon-edit" data-icon="icon-edit"></i><cite>修改密码</cite></a></dd>
+                        <dd><a href="<{:U('admin/public/logout')}>" class="signOut"><i class="iconfont icon-close"></i><cite>退出</cite></a></dd>
                     </dl>
                 </li>
             </ul>

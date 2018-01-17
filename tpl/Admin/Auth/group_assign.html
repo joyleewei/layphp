@@ -20,7 +20,7 @@
     <blockquote class="layui-elem-quote">
         <h3>[ <{$group_info['title']}> ] 组权限管理</h3>
     </blockquote>
-    <form class="layui-form">
+    <form class="layui-form rule_list">
         <table class="layui-table" lay-even>
             <colgroup>
                 <col width="120">
@@ -34,9 +34,9 @@
             </thead>
             <tbody>
             <volist name="rule_list" id="vo">
-                <tr>
+                <tr  class="b-group" data-val='1234'>
                     <td>
-                        <input type="checkbox" <empty name="vo['_data']">name="rules[<{$vo['id']}>]"</empty>  value="<{$vo['id']}>" title="<{$vo['title']}>"  <if condition="in_array($vo['id'],$group_rule)">checked='checked'</if> >
+                        <input type="checkbox"  class='rule_check' lay-filter="checkall" value="<{$vo['id']}>" title="<{$vo['title']}>"  <if condition="in_array($vo['id'],$group_rule)">checked='checked'</if> >
                     </td>
                     <td>
                         <if condition="!empty($vo['_data'])">
@@ -46,14 +46,14 @@
                                         <col width="120">
                                         <col>
                                     </colgroup>
-                                    <tr>
+                                    <tr class="b-group" data-val="abcd">
                                         <td>
-                                            <input type="checkbox" name="rules[<{$vo1['id']}>]" value="<{$vo1['id']}>" title="<{$vo1['title']}>"  <if condition="in_array($vo1['id'],$group_rule)">checked='checked'</if> >
+                                            <input type="checkbox" class='rule_check' lay-filter="checkall" value="<{$vo1['id']}>" title="<{$vo1['title']}>" <if condition="in_array($vo1['id'],$group_rule)">checked='checked'</if> >
                                         </td>
                                         <td>
                                             <if condition="!empty($vo1['_data'])">
                                                 <volist name="vo1['_data']" id="vo2">
-                                                    <input type="checkbox" name="rules[<{$vo2['id']}>]" value="<{$vo2['id']}>" title="<{$vo2['title']}>" <if condition="in_array($vo2['id'],$group_rule)">checked='checked'</if> >
+                                                    <input type="checkbox" class='rule_check' value="<{$vo2['id']}>" title="<{$vo2['title']}>" <if condition="in_array($vo2['id'],$group_rule)">checked='checked'</if> >
                                                 </volist>
                                             <else />
                                                 &nbsp;
@@ -73,7 +73,7 @@
     </form>
     <blockquote class="layui-elem-quote">
         <div class="layui-inline">
-            <a class="layui-btn layui-btn-normal assignGroup">分配权限</a>
+            <a href="javascript:void(0);" data-id="<{$group_info['id']}>" class="layui-btn layui-btn-normal assignGroup">分配权限</a>
         </div>
     </blockquote>
 </body>

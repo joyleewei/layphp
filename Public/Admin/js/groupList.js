@@ -107,6 +107,60 @@ layui.config({
         return false;
     });
 
+    // 分配权限按钮
+    $('.assignGroup').click(function(){
+        var index = top.layer.msg('数据提交中，请稍候',{icon: 16,time:false,shade:0.8});
+        var $id = $(this).attr('data-id');
+        var $checked = $('.rule_check:checked');
+        var $chk_len = $checked.length;
+        var url = '/admin/auth/group_assign.html?t='+new Date().getTime();
+        if($chk_len >0){
+            var $json = '{"id":'+$id+',"rules":"';
+            for(var i=0;i<$chk_len;i++){
+                $id = $checked.eq(i).val();
+                if(i == $chk_len -1){
+                    $json += $id;
+                }else{
+                    $json += $id+',';
+                }
+            }
+            $json +='"}';
+        }else{
+            $json = '{"id":'+$id+',"rules":""}';
+        }
+        $post = JSON.parse($json);
+        // 发起ajax 请求
+        $.ajax({
+            'url':url,
+            'type':'POST',
+            'dataType':'json',
+            'data':$post,
+            'success':function(data){
+                if(data.status == 1){
+                    top.layer.close(index);
+                    top.layer.msg(data.msg,{'icon':1});
+                    layer.closeAll("iframe");
+                    $('.refresh').click();
+                }else{
+                    top.layer.close(index);
+                    top.layer.msg(data.msg,{'icon':2});
+                    layer.closeAll("iframe");
+                    $('.refresh').click();
+                }
+            },
+            'error':function(XMLHttpRequest, textStatus){
+                var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                xmlhttp.abort();
+                console.log(textStatus);
+                top.layer.close(index);
+                top.layer.msg('接口发生错误，请稍后重试',{'icon':2});
+                layer.closeAll("iframe");
+                $('.refresh').click();
+            }
+        });
+        return false;
+    });
+
     // 提交增加用户组
     form.on("submit(addGroup)",function(data){
         //弹出loading
@@ -224,41 +278,9 @@ layui.config({
             layer.msg('您好，操作失败，请确认后重试',{icon: 16,time:false,shade:0.8});
         }
     });
-
-    // 分配用户组提交按钮
-    form.on("submit(assignGroup)",function(data){
-        //弹出loading
-        var index = top.layer.msg('数据提交中，请稍候',{icon: 16,time:false,shade:0.8});
-        // 发起ajax 请求。
-        var url = '/admin/auth/group_assign.html?t='+ new Date().getTime();
-        var $post = data.field;
-        $.ajax({
-            'url':url,
-            'type':'POST',
-            'dataType':'json',
-            'data':$post,
-            'success':function(data){
-                if(data.status == 1){
-                    top.layer.close(index);
-                    top.layer.msg(data.msg,{'icon':1});
-                    layer.closeAll("iframe");
-                    parent.location.reload();
-                }else{
-                    top.layer.close(index);
-                    top.layer.msg(data.msg,{'icon':2});
-                }
-            },
-            'error':function(XMLHttpRequest, textStatus){
-                var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
-                xmlhttp.abort();
-                console.log(textStatus);
-                top.layer.close(index);
-                top.layer.msg('接口发生错误，请稍后重试',{'icon':2});
-                layer.closeAll("iframe");
-                parent.location.reload();
-            }
-        });
-        return false;
-    });
-
+    // 全选功能
+    form.on('checkbox(checkall)',function(data){
+        $(this).parents('.b-group').eq(0).find("input[type='checkbox']").prop('checked', $(this).prop('checked'));
+        form.render('checkbox');
+    })
 });

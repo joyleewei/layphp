@@ -2,11 +2,13 @@
 namespace Admin\Controller;
 use Common\Controller\AdminbaseController;
 class AuthController extends AdminbaseController{
+    private $user_model;
     private $auth_rule_model;
     private $auth_group_model;
     private $auth_groupaccess_model;
     public function __construct(){
         parent::__construct();
+        $this->user_model = D('Admin/User');
         $this->auth_rule_model = D('Admin/AuthRule');
         $this->auth_group_model = D('Admin/AuthGroup');
         $this->auth_groupaccess_model = D('Admin/AuthGroupAccess');
@@ -307,14 +309,46 @@ class AuthController extends AdminbaseController{
     // 分配权限
     public function group_assign(){
         if(IS_POST){
-
+            $id = I('post.id',0,'intval,htmlspecialchars,addslashes');
+            if(!empty($id)){
+                $map_group['id'] = $id;
+                $count = $this->auth_group_model->where($map_group)->count();
+                file_put_contents('post.log',$this->auth_group_model->getLastSql()."\r\n\r\n",FILE_APPEND);
+                if($count > 0){
+                    $rules = I('post.rules','htmlspecialchar,addslashes');
+                    $save_res = $this->auth_group_model->where($map_group)->setField('rules',$rules);
+                    if(!empty($save_res)){
+                        $res = array(
+                            'status' => 1,
+                            'msg'=>'您好，修改权限成功。'
+                        );
+                    }else{
+                        $res = array(
+                            'status' => 0,
+                            'msg'=>'您好，修改权限失败，请稍后重试。'
+                        );
+                    }
+                }else{
+                    $res = array(
+                        'status' => 0,
+                        'msg'=>'您好，该角色组不存在，请确认后重试。'
+                    );
+                }
+            }else{
+                $res = array(
+                    'status' => 0,
+                    'msg'=>'您好，请选择需要修改的角色组。'
+                );
+            }
+            echo json_encode($res,true);
+            exit();
         }else{
             $id = I('get.id',0,'intval');
             if(!empty($id)){
                 $map_group['id'] = $id;
                 $group_info = $this->auth_group_model->where($map_group)->find();
                 if(!empty($group_info)){
-                    $group_rule = explode(',',$group_info['rule']);
+                    $group_rule = explode(',',$group_info['rules']);
                     $rule_list = $this->auth_rule_model->getTreeData('level','id','title','id','pid');
                     $this->assign('group_info',$group_info);
                     $this->assign('group_rule',$group_rule);
@@ -331,13 +365,23 @@ class AuthController extends AdminbaseController{
 
     // 管理员列表
     public function user(){
+        // state: 1:启用 2:禁用 3:删除
+        $map['state'] = array('in',array(1,2));
+        $list = $this->user_model->where($map)->getField('id,username,nickname,sex,state,phone,email');
 
+        $this->assign('list',$list);
         $this->display();
     }
     // 增加管理员
     public function user_add(){
 
     }
+
+    // 查看管理员信息
+    public function user_view(){
+
+    }
+
     // 编辑管理员
     public function user_edit(){
 
