@@ -13,4 +13,5 @@ class AuthGroupModel extends Model{
         $group = $this->where($map)->getField('id,title');
         return $group;
     }
+
 }

@@ -11,4 +11,11 @@ class UserModel extends Model{
         array('email','require','请填写用户邮箱')
     );
 
+    public function get_info($user_id){
+        $map['id'] = $user_id;
+        $map['state'] = array('in',array(1,2));
+        $info = $this->where($map)->find();
+        return $info;
+    }
+
 }

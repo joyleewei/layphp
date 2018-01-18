@@ -140,12 +140,12 @@ layui.config({
                     top.layer.close(index);
                     top.layer.msg(data.msg,{'icon':1});
                     layer.closeAll("iframe");
-                    $('.refresh').click();
+                    window.location.reload();
                 }else{
                     top.layer.close(index);
                     top.layer.msg(data.msg,{'icon':2});
                     layer.closeAll("iframe");
-                    $('.refresh').click();
+                    window.location.reload();
                 }
             },
             'error':function(XMLHttpRequest, textStatus){
@@ -155,7 +155,7 @@ layui.config({
                 top.layer.close(index);
                 top.layer.msg('接口发生错误，请稍后重试',{'icon':2});
                 layer.closeAll("iframe");
-                $('.refresh').click();
+                window.location.reload();
             }
         });
         return false;

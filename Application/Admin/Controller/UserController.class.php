@@ -20,18 +20,6 @@ class UserController extends AdminbaseController{
                 $data['birth'] = strtotime($data['birth']);
                 $save = $this->user_model->save($data);
                 if(!empty($save)){
-                    /*
-                    # 用户组
-                    $map_auth_group['uid'] = $data['id'];
-                    $this->auth_group_access_model->where($map_auth_group)->delete();
-                    $group = I('post.group');
-                    foreach($group as $k=>$v){
-                        $data_group['uid'] = $data['id'];
-                        $data_group['group_id'] = $v;
-                        $this->auth_group_access_model->add($data_group);
-                        unset($data_group);
-                    }
-                    */
                     $res = array(
                         'status'=>1,
                         'msg'=>'您好，修改成功',
@@ -70,12 +58,12 @@ class UserController extends AdminbaseController{
                 $redis = new \Redis();
                 $res = $redis->connect('127.0.0.1',6379);
                 if(empty($res)){
-                    throw new Exception('连接失败');
+                    throw new \Exception('连接失败');
                 }
-            }catch(Exception $e){
+            }catch(\Exception $e){
                 $msg = $e->getMessage();
                 $this->error($msg,U('admin/index/index'));
-                eixt();
+                exit();
             }
             $province = $redis->hGetAll('province');;
             if(empty($province)){
@@ -101,7 +89,7 @@ class UserController extends AdminbaseController{
                     $map_area['parentid'] = $user_info['city'];
                     $map_area['level'] = 3;
                     $area = $this->area_model->where($map_area)->getField('id,areaname');
-                    $redis->hMset('area:'.$user_info['city']);
+                    $redis->hMset('area:'.$user_info['city'],$area);
                 }
                 $this->assign('area',$area);
             }

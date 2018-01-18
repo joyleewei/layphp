@@ -1,111 +1,172 @@
 layui.config({
-    base : "js/"
-}).use(['form','layer','jquery','laypage'],function(){
-    var form = layui.form(),
-        layer = parent.layer === undefined ? layui.layer : parent.layer,
-        laypage = layui.laypage,
-        $ = layui.jquery;
+    base : "/Public/Admin/js/"
+}).use(['form','layer','upload','laydate','jquery'],function(){
+    var form = layui.form();
+    var layer = parent.layer === undefined ? layui.layer : parent.layer;
+    var $ = layui.jquery;
+    var laydate = layui.laydate;
+    $form = $('form');
 
-    //加载页面数据
-    var usersData = '';
-    $.get("../../json/usersList.json", function(data){
-        usersData = data;
-        if(window.sessionStorage.getItem("addUser")){
-            var addUser = window.sessionStorage.getItem("addUser");
-            usersData = JSON.parse(addUser).concat(usersData);
-        }
-        //执行加载数据的方法
-        usersList();
-    })
-
-    //查询
-    $(".search_btn").click(function(){
-        var userArray = [];
-        if($(".search_input").val() != ''){
-            var index = layer.msg('查询中，请稍候',{icon: 16,time:false,shade:0.8});
-            setTimeout(function(){
-                $.ajax({
-                    url : "../../json/usersList.json",
-                    type : "get",
-                    dataType : "json",
-                    success : function(data){
-                        if(window.sessionStorage.getItem("addUser")){
-                            var addUser = window.sessionStorage.getItem("addUser");
-                            usersData = JSON.parse(addUser).concat(data);
-                        }else{
-                            usersData = data;
-                        }
-                        for(var i=0;i<usersData.length;i++){
-                            var usersStr = usersData[i];
-                            var selectStr = $(".search_input").val();
-                            function changeStr(data){
-                                var dataStr = '';
-                                var showNum = data.split(eval("/"+selectStr+"/ig")).length - 1;
-                                if(showNum > 1){
-                                    for (var j=0;j<showNum;j++) {
-                                        dataStr += data.split(eval("/"+selectStr+"/ig"))[j] + "<i style='color:#03c339;font-weight:bold;'>" + selectStr + "</i>";
-                                    }
-                                    dataStr += data.split(eval("/"+selectStr+"/ig"))[showNum];
-                                    return dataStr;
-                                }else{
-                                    dataStr = data.split(eval("/"+selectStr+"/ig"))[0] + "<i style='color:#03c339;font-weight:bold;'>" + selectStr + "</i>" + data.split(eval("/"+selectStr+"/ig"))[1];
-                                    return dataStr;
-                                }
-                            }
-                            //用户名
-                            if(usersStr.userName.indexOf(selectStr) > -1){
-                                usersStr["userName"] = changeStr(usersStr.userName);
-                            }
-                            //用户邮箱
-                            if(usersStr.userEmail.indexOf(selectStr) > -1){
-                                usersStr["userEmail"] = changeStr(usersStr.userEmail);
-                            }
-                            //性别
-                            if(usersStr.userSex.indexOf(selectStr) > -1){
-                                usersStr["userSex"] = changeStr(usersStr.userSex);
-                            }
-                            //会员等级
-                            if(usersStr.userGrade.indexOf(selectStr) > -1){
-                                usersStr["userGrade"] = changeStr(usersStr.userGrade);
-                            }
-                            if(usersStr.userName.indexOf(selectStr)>-1 || usersStr.userEmail.indexOf(selectStr)>-1 || usersStr.userSex.indexOf(selectStr)>-1 || usersStr.userGrade.indexOf(selectStr)>-1){
-                                userArray.push(usersStr);
-                            }
-                        }
-                        usersData = userArray;
-                        usersList(usersData);
-                    }
-                })
-
-                layer.close(index);
-            },2000);
-        }else{
-            layer.msg("请输入需要查询的内容");
-        }
-    })
-
-    //添加会员
-    $(".usersAdd_btn").click(function(){
+    //添加后台管理员 弹窗
+    $(".userAdd_btn").click(function(){
+        var $url = '/admin/auth/user_add.html?t='+new Date().getTime();
         var index = layui.layer.open({
-            title : "添加会员",
+            title : "添加后台管理员",
             type : 2,
-            content : "addUser.html",
+            content : $url,
             success : function(layero, index){
                 setTimeout(function(){
-                    layui.layer.tips('点击此处返回会员列表', '.layui-layer-setwin .layui-layer-close', {
+                    layui.layer.tips('点击此处返回管理员列表', '.layui-layer-setwin .layui-layer-close', {
                         tips: 3
                     });
                 },500)
             }
-        })
+        });
         //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
         $(window).resize(function(){
             layui.layer.full(index);
-        })
+        });
         layui.layer.full(index);
     });
 
-    //批量删除
+    // 提交 增加后台管理员资料 post
+    form.on("submit(addUser)",function(data){
+        var index = top.layer.msg('提交中，请稍候',{icon: 16,time:false,shade:0.8});
+        var $post = data.field;
+        delete $post.file;
+        var $url = '/admin/auth/user_add.html?t='+new Date().getTime();
+        $.ajax({
+            'url':$url,
+            'type':'POST',
+            'dataType':'json',
+            'data':$post,
+            'success':function(data){
+                if(data.status == 1){
+                    top.layer.close(index);
+                    top.layer.msg(data.msg,{'icon':1});
+                    layer.closeAll("iframe");
+                    parent.location.reload();
+                }else{
+                    top.layer.close(index);
+                    top.layer.msg(data.msg,{'icon':2});
+                    layer.closeAll("iframe");
+                    parent.location.reload();
+                }
+            },
+            'error':function(XMLHttpRequest, textStatus){
+                var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                xmlhttp.abort();
+                console.log(textStatus);
+                top.layer.close(index);
+                top.layer.msg('接口发生错误，请稍后重试',{'icon':2});
+                layer.closeAll("iframe");
+                parent.location.reload();
+            }
+        });
+        return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+    });
+
+    //编辑用户 弹窗
+    $('.userEdit_btn').click(function(){
+        var $id = $(this).attr('data-id');
+        var $url = '/admin/auth/user_edit.html?t='+new Date().getTime()+'&id='+$id;
+        var index = layui.layer.open({
+            title : "编辑后台管理员",
+            type : 2,
+            content : $url,
+            success : function(layero, index){
+                setTimeout(function(){
+                    layui.layer.tips('点击此处返回管理员列表', '.layui-layer-setwin .layui-layer-close', {
+                        tips: 3
+                    });
+                },500)
+            }
+        });
+        //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+        $(window).resize(function(){
+            layui.layer.full(index);
+        });
+        layui.layer.full(index);
+    });
+
+    form.on('submit(editUser)',function(data){
+        var index = top.layer.msg('提交中，请稍候',{icon: 16,time:false,shade:0.8});
+        var $post = data.field;
+        delete $post.file;
+        var $url = '/admin/auth/user_edit.html?t='+new Date().getTime();
+        $.ajax({
+            'url':$url,
+            'type':'POST',
+            'dataType':'json',
+            'data':$post,
+            'success':function(data){
+                if(data.status == 1){
+                    top.layer.close(index);
+                    top.layer.msg(data.msg,{'icon':1});
+                    layer.closeAll("iframe");
+                    parent.location.reload();
+                    if(data.image){
+                        parent.parent.$('.index_nickname').html(data.nickname);
+                        parent.parent.$('.index_image').attr({'src':data.image});
+                    }
+                }else{
+                    top.layer.close(index);
+                    top.layer.msg(data.msg,{'icon':2});
+                    layer.closeAll("iframe");
+                    parent.location.reload();
+                }
+            },
+            'error':function(XMLHttpRequest, textStatus){
+                var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                xmlhttp.abort();
+                console.log(textStatus);
+                top.layer.close(index);
+                top.layer.msg('接口发生错误，请稍后重试',{'icon':2});
+                layer.closeAll("iframe");
+                parent.location.reload();
+            }
+        });
+        return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
+    });
+
+    // 查看管理员信息 弹窗
+    $('.userView_btn').click(function(){
+        var $id = $(this).attr('data-id');
+        var $url = '/admin/auth/user_view.html?t='+new Date().getTime()+'&id='+$id;
+        var index = layui.layer.open({
+            title : "查看后台管理员",
+            type : 2,
+            content : $url,
+            success : function(layero, index){
+                setTimeout(function(){
+                    layui.layer.tips('点击此处返回管理员列表', '.layui-layer-setwin .layui-layer-close', {
+                        tips: 3
+                    });
+                },500)
+            }
+        });
+        //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
+        $(window).resize(function(){
+            layui.layer.full(index);
+        });
+        layui.layer.full(index);
+    });
+
+    // 删除后台用户
+    $("body").on("click",".users_del",function(){  //删除
+        var _this = $(this);
+        layer.confirm('确定删除此用户？',{icon:3, title:'提示信息'},function(index){
+            //_this.parents("tr").remove();
+            for(var i=0;i<usersData.length;i++){
+                if(usersData[i].usersId == _this.attr("data-id")){
+                    usersData.splice(i,1);
+                    usersList(usersData);
+                }
+            }
+            layer.close(index);
+        });
+    });
+    //批量删除后台用户
     $(".batchDel").click(function(){
         var $checkbox = $('.users_list tbody input[type="checkbox"][name="checked"]');
         var $checked = $('.users_list tbody input[type="checkbox"][name="checked"]:checked');
@@ -132,85 +193,120 @@ layui.config({
             layer.msg("请选择需要删除的文章");
         }
     })
-
+    // 图片上传
+    layui.upload({
+        'url' : "/api/upload/image.html?t="+new Date().getTime(),
+        'method':'POST',
+        'ext': 'jpg|png|gif|jpeg',
+        'success': function(data){
+            if(data.status == 1){
+                $('#userFace').attr('src',data.path);
+                $('#image').val(data.path);
+                layer.msg(data.msg);
+            }else{
+                layer.msg(data.msg,{'icon':2,'time':2000});
+                // 刷新当前页面
+                $(".refresh").click();
+            }
+        }
+    });
+    // 省 市 县 三级联动
+    form.on('select(province)', function(data) {
+        // 县/区先清零
+        $form.find('select[name=area]').html('<option value="">请选择县/区</option>').attr({'disabled':'disabled'});
+        var value = data.value;
+        loadCity(value);
+        return false;
+    });
+    function loadCity(id){
+        var $str = '<option value="">请选择市</option>';
+        $form.find('select[name=city]').html($str);
+        var url = '/api/city/get.html?t='+new Date().getTime();
+        $.ajax({
+            'url':url,
+            'type':'POST',
+            'dataType':'json',
+            'data':{'areaid':id},
+            'success':function(data){
+                if(data.status == 1){
+                    if(data.count > 0){
+                        var cityHtml = '<option value="">请选择市</option>';
+                        $.each(data.area,function(index,elem){
+                            cityHtml += '<option value="'+index+'">'+elem+'</option>';
+                        });
+                        $form.find('select[name=city]').html(cityHtml);
+                        form.render('select');
+                        form.on('select(city)', function(data) {
+                            var value = data.value;
+                            loadArea(value);
+                            return false;
+                        });
+                    }else{
+                        $form.find('select[name=city]').attr({'disabled':'disabled'});
+                    }
+                }else{
+                    layer.msg('接口发生错误，请稍后重试',{'icon':2});
+                }
+            },
+            'error':function(XMLHttpRequest, textStatus){
+                var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                xmlhttp.abort();
+                console.log(textStatus);
+                layer.msg('接口发生错误，请稍后重试',{'icon':2});
+            }
+        });
+        return false;
+    }
+    function loadArea(id){
+        var $str = '<option value="">请选择县/区</option>';
+        var url = '/api/city/get.html?t='+new Date().getTime();
+        $form.find('select[name=area]').html($str).removeAttr('disabled');
+        $.ajax({
+            'url':url,
+            'type':'POST',
+            'dataType':'json',
+            'data':{'areaid':id},
+            'success':function(data){
+                if(data.status==1){
+                    if(data.count > 0){
+                        var areaHtml = '<option value="">请选择县/区</option>';
+                        $.each(data.area,function(index,elem){
+                            areaHtml += '<option value="'+index+'">'+elem+'</option>';
+                        })
+                        $form.find('select[name=area]').html(areaHtml);
+                        form.render('select');
+                    }else{
+                        $form.find('select[name=area]').attr({'disabled':'disabled'});
+                    }
+                }
+            },
+            'error':function(XMLHttpRequest, textStatus){
+                var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                xmlhttp.abort();
+                console.log(textStatus);
+                layer.msg('接口发生错误，请稍后重试',{'icon':2});
+            }
+        });
+        return false;
+    }
     //全选
     form.on('checkbox(allChoose)', function(data){
-        var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]:not([name="show"])');
+        var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
         child.each(function(index, item){
             item.checked = data.elem.checked;
         });
         form.render('checkbox');
     });
 
-    //通过判断文章是否全部选中来确定全选按钮是否选中
+    //通过判断栏目是否全部选中来确定全选按钮是否选中
     form.on("checkbox(choose)",function(data){
-        var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]:not([name="show"])');
-        var childChecked = $(data.elem).parents('table').find('tbody input[type="checkbox"]:not([name="show"]):checked')
+        var child = $(data.elem).parents('table').find('tbody input[type="checkbox"]');
+        var childChecked = $(data.elem).parents('table').find('tbody input[type="checkbox"]:checked')
         if(childChecked.length == child.length){
             $(data.elem).parents('table').find('thead input#allChoose').get(0).checked = true;
         }else{
             $(data.elem).parents('table').find('thead input#allChoose').get(0).checked = false;
         }
         form.render('checkbox');
-    })
-
-    //操作
-    $("body").on("click",".users_edit",function(){  //编辑
-        layer.alert('您点击了会员编辑按钮，由于是纯静态页面，所以暂时不存在编辑内容，后期会添加，敬请谅解。。。',{icon:6, title:'文章编辑'});
-    })
-
-    $("body").on("click",".users_del",function(){  //删除
-        var _this = $(this);
-        layer.confirm('确定删除此用户？',{icon:3, title:'提示信息'},function(index){
-            //_this.parents("tr").remove();
-            for(var i=0;i<usersData.length;i++){
-                if(usersData[i].usersId == _this.attr("data-id")){
-                    usersData.splice(i,1);
-                    usersList(usersData);
-                }
-            }
-            layer.close(index);
-        });
-    })
-
-    function usersList(){
-        //渲染数据
-        function renderDate(data,curr){
-            var dataHtml = '';
-            currData = usersData.concat().splice(curr*nums-nums, nums);
-            if(currData.length != 0){
-                for(var i=0;i<currData.length;i++){
-                    dataHtml += '<tr>'
-                    +  '<td><input type="checkbox" name="checked" lay-skin="primary" lay-filter="choose"></td>'
-                    +  '<td>'+currData[i].userName+'</td>'
-                    +  '<td>'+currData[i].userEmail+'</td>'
-                    +  '<td>'+currData[i].userSex+'</td>'
-                    +  '<td>'+currData[i].userGrade+'</td>'
-                    +  '<td>'+currData[i].userStatus+'</td>'
-                    +  '<td>'+currData[i].userEndTime+'</td>'
-                    +  '<td>'
-                    +    '<a class="layui-btn layui-btn-mini users_edit"><i class="iconfont icon-edit"></i> 编辑</a>'
-                    +    '<a class="layui-btn layui-btn-danger layui-btn-mini users_del" data-id="'+data[i].usersId+'"><i class="layui-icon">&#xe640;</i> 删除</a>'
-                    +  '</td>'
-                    +'</tr>';
-                }
-            }else{
-                dataHtml = '<tr><td colspan="8">暂无数据</td></tr>';
-            }
-            return dataHtml;
-        }
-
-        //分页
-        var nums = 13; //每页出现的数据量
-        laypage({
-            cont : "page",
-            pages : Math.ceil(usersData.length/nums),
-            jump : function(obj){
-                $(".users_content").html(renderDate(usersData,obj.curr));
-                $('.users_list thead input[type="checkbox"]').prop("checked",false);
-                form.render();
-            }
-        })
-    }
-
-})
+    });
+});

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>查看个人资料--layphp后台管理模板</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="__PUBLIC__/static/layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="__PUBLIC__/Admin/css/user.css" media="all" />
+    <script type="text/javascript" src="__PUBLIC__/static/layui/layui.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/Admin/js/userList.js"></script>
+</head>
+<body class="childrenBody">
+<form class="layui-form">
+    <div class="user_left">
+        <div class="layui-form-item">
+            <label class="layui-form-label">登录名</label>
+            <div class="layui-input-block">
+                <input type="text" value="<{$user_info['username']}>" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户组</label>
+            <div class="layui-input-block">
+                <if condition="!empty($group_info)">
+                    <volist name="group_info" id="vo">
+                        <span  class="layui-btn layui-btn-primary" ><{$vo}></span>
+                    </volist>
+                    <else />
+                    <span class="layui-btn layui-btn-warm">暂未分配用户组</span>
+                </if>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户昵称</label>
+            <div class="layui-input-block">
+                <input type="text" value="<{$user_info['nickname']}>" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item" pane="">
+            <label class="layui-form-label">用户性别</label>
+            <div class="layui-input-block userSex">
+                <switch name="user_info['sex']">
+                    <case value="1">
+                        <input type="radio" checked='checked' value="1" title="男">
+                    </case>
+                    <case value="2">
+                        <input type="radio" checked='checked' value="2" title="女">
+                    </case>
+                    <case value="3">
+                        <input type="radio" checked='checked' value="3" title="保密">
+                    </case>
+                </switch>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户状态</label>
+            <div class="layui-input-block">
+                <switch name="user_info['state']">
+                    <case value="1">
+                        <input type="radio" value="1" checked="checked" title="启用">
+                    </case>
+                    <case value="2">
+                        <input type="radio" value="2" checked="checked" title="禁用">
+                    </case>
+                </switch>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">手机号码</label>
+            <div class="layui-input-block">
+                <input type="tel" value="<{$user_info['phone']}>"  required lay-verify="required|phone" class="layui-input userPhone">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">出生年月</label>
+            <div class="layui-input-block">
+                <input type="text" value="<{:date('Y-m-d',$user_info['birth'])}>"   class="layui-input userBirthday">
+            </div>
+        </div>
+        <div class="layui-form-item userAddress">
+            <label class="layui-form-label">家庭住址</label>
+            <div class="layui-input-inline">
+                <select name="province"  lay-verify="required"  required lay-filter="province">
+                    <option><{$province}></option>
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <select name="city"  lay-verify="required"  required lay-filter="city">
+                    <option><{$city}></option>
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <select name="area" required lay-verify="required" lay-filter="area">
+                    <option><{$area}></option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户邮箱</label>
+            <div class="layui-input-block">
+                <input type="text" name="email" value="<{$user_info['email']}>" placeholder="请输入邮箱" required lay-verify="required|email" class="layui-input userEmail">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户评价</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请自我评价" name="myself" class="layui-textarea myself"><{$user_info['myself']}></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="user_right">
+        <p>我的头像 ^_^</p>
+        <img src="<{$user_info['image']}>" class="layui-circle" id="userFace">
+    </div>
+</form>
+</body>
+</html>

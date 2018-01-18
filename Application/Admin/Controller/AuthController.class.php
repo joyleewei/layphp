@@ -5,13 +5,14 @@ class AuthController extends AdminbaseController{
     private $user_model;
     private $auth_rule_model;
     private $auth_group_model;
-    private $auth_groupaccess_model;
+    private $auth_group_access_model;
     public function __construct(){
         parent::__construct();
         $this->user_model = D('Admin/User');
+        $this->area_model = M('Area');
         $this->auth_rule_model = D('Admin/AuthRule');
         $this->auth_group_model = D('Admin/AuthGroup');
-        $this->auth_groupaccess_model = D('Admin/AuthGroupAccess');
+        $this->auth_group_access_model = D('Admin/AuthGroupAccess');
     }
     // 权限管理列表
     public function index(){
@@ -238,7 +239,7 @@ class AuthController extends AdminbaseController{
                 $res_group = $this->auth_group_model->where($map_group)->delete();
                 if(!empty($res_group)){
                     $map_access['group_id'] = $id;
-                    $this->auth_groupaccess_model->where($map_access)->delete();
+                    $this->auth_group_access_model->where($map_access)->delete();
                     $res = array(
                         'status' => 1,
                         'msg'=>'您好，删除成功。'
@@ -313,7 +314,7 @@ class AuthController extends AdminbaseController{
             if(!empty($id)){
                 $map_group['id'] = $id;
                 $count = $this->auth_group_model->where($map_group)->count();
-                file_put_contents('post.log',$this->auth_group_model->getLastSql()."\r\n\r\n",FILE_APPEND);
+                //file_put_contents('post.log',$this->auth_group_model->getLastSql()."\r\n\r\n",FILE_APPEND);
                 if($count > 0){
                     $rules = I('post.rules','htmlspecialchar,addslashes');
                     $save_res = $this->auth_group_model->where($map_group)->setField('rules',$rules);
@@ -368,28 +369,241 @@ class AuthController extends AdminbaseController{
         // state: 1:启用 2:禁用 3:删除
         $map['state'] = array('in',array(1,2));
         $list = $this->user_model->where($map)->getField('id,username,nickname,sex,state,phone,email');
-
         $this->assign('list',$list);
         $this->display();
     }
     // 增加管理员
     public function user_add(){
-
-    }
-
-    // 查看管理员信息
-    public function user_view(){
-
+        if(IS_POST){
+            $data = $this->user_model->create();
+            if(!empty($data)){
+                $data['password'] = md5($data['password']);
+                $data['myself'] = strip_tags($data['myself']);
+                $data['create_time'] = time();
+                $data['birth'] = strtotime($data['birth']);
+                $add_res = $this->user_model->add($data);
+                if(!empty($add_res)){
+                    // 加入用户组
+                    $rules = I('post.rules');
+                    foreach($rules as $k=>$v){
+                        $data_group['uid'] =$add_res;
+                        $data_group['group_id'] = $v;
+                        $this->auth_group_access_model->add($data_group);
+                        unset($data_group);
+                    }
+                    $res = array(
+                        'status'=>1,
+                        'msg'=>'您好，添加成功'
+                    );
+                }else{
+                    $res = array(
+                        'status'=>0,
+                        'msg'=>'您好，添加失败，请稍后重试'
+                    );
+                }
+            }else{
+                $error = $this->user_model->getError();
+                $res = array(
+                    'status' => 0,
+                    'msg'=>$error
+                );
+            }
+            echo json_encode($res,true);
+            exit();
+        }else{
+            // 获取省 市 县
+            try{
+                $redis = new \Redis();
+                $res = $redis->connect('127.0.0.1',6379);
+                if(empty($res)){
+                    throw new \Exception('连接失败');
+                }
+            }catch(\Exception $e){
+                $msg = $e->getMessage();
+                $this->error($msg,U('admin/index/index'));
+                exit();
+            }
+            $province = $redis->hGetAll('province');;
+            if(empty($province)){
+                $map_province['level'] = 1;
+                $province = $this->area_model->where($map_province)->getField('id,areaname');
+                $redis->hMset('province',$province);
+            }
+            // 获取用户组
+            $group = $this->auth_group_model->get_group();
+            $this->assign('group',$group);
+            $this->assign('province',$province);
+            $this->display();
+        }
     }
 
     // 编辑管理员
     public function user_edit(){
+        if(IS_POST){
+            $data = $this->user_model->create();
+            if(!empty($data)){
+                $data['update_time'] = time();
+                $data['birth'] = strtotime($data['birth']);
+                $data['myself'] = strip_tags($data['myself']);
+                $save_res = $this->user_model->save($data);
+                if(!empty($save_res)){
+                    $rules = I('post.rules');
+                    $map_group['uid'] = $data['id'];
+                    $this->auth_group_access_model->where($map_group)->delete();
+                    // 加入用户组
+                    $rules = I('post.rules');
+                    foreach($rules as $k=>$v){
+                        $data_group['uid'] =$data['id'];
+                        $data_group['group_id'] = $v;
+                        $this->auth_group_access_model->add($data_group);
+                        unset($data_group);
+                    }
 
+                    if($data['id'] == $_SESSION['user_info']['id']){
+                        $res = array(
+                            'status'=>1,
+                            'msg'=>'您好，添加成功',
+                            'nickname'=>$data['nickname'],
+                            'image'=>$data['image']
+                        );
+                    }else{
+                        $res = array(
+                            'status'=>1,
+                            'msg'=>'您好，添加成功'
+                        );
+                    }
+                }else{
+                    $res = array(
+                        'status' => 0,
+                        'msg' => '您好，编辑失败，请稍后重试'
+                    );
+                }
+            }else{
+                $error = $this->user_model->getError();
+                $res = array(
+                    'status' => 0,
+                    'msg' => $error
+                );
+            }
+            echo json_encode($res,true);
+            exit();
+        }else{
+            $id = I('get.id',0,'intval');
+            if(!empty($id)){
+                $user_info = $this->user_model->get_info($id);
+                if(!empty($user_info)){
+                    // 获取用户组
+                    $group = $this->auth_group_model->get_group();
+                    // 获取用户所在的组
+                    $user_group = $this->auth_group_access_model->get_gid($id);
+                    try{
+                        $redis = new \Redis();
+                        $res = $redis->connect('127.0.0.1',6379);
+                        if(empty($res)){
+                            throw new \Exception('连接失败');
+                        }
+                    }catch(\Exception $e){
+                        $msg = $e->getMessage();
+                        $this->error($msg,U('admin/index/index'));
+                        exit();
+                    }
+                    $province = $redis->hGetAll('province');;
+                    if(empty($province)){
+                        $map_province['level'] = 1;
+                        $province = $this->area_model->where($map_province)->getField('id,areaname');
+                        $redis->hMset('province',$province);
+                    }
+                    if(!empty($user_info['province'])){
+                        $city = $redis->hGetAll('city:'.$user_info['province']);
+                        if(empty($city)){
+                            $map_city['parentid'] = $user_info['province'];
+                            $map_city['level'] = 2;
+                            $city = $this->area_model->where($map_city)->getField('id,areaname');
+                            $redis->hMset('city:'.$user_info['province'],$city);
+                        }
+                        $this->assign('city',$city);
+                    }
+
+                    if(!empty($user_info['city'])){
+                        $area = $redis->hGetAll('area:'.$user_info['city']);
+                        if(empty($area)){
+                            $map_area['parentid'] = $user_info['city'];
+                            $map_area['level'] = 3;
+                            $area = $this->area_model->where($map_area)->getField('id,areaname');
+                            $redis->hMset('area:'.$user_info['city'],$area);
+                        }
+                        $this->assign('area',$area);
+                    }
+                    $this->assign('group',$group);
+                    $this->assign('user_group',$user_group);
+                    $this->assign('user_info',$user_info);
+                    $this->assign('province',$province);
+                    $this->assign('city',$city);
+                    $this->assign('area',$area);
+                    $this->display();
+                }else{
+                    $this->error('您好，该管理员信息不存在，请确认后重试',U('/admin/auth/user'));
+                }
+            }else{
+                $this->error('您好，该管理员信息不存在，请确认后重试',U('/admin/auth/user'));
+            }
+        }
     }
+
     // 删除管理员
     public function user_delete(){
 
     }
 
-
+    // 查看管理员信息
+    public function user_view(){
+        $user_id  = I('get.id',0,'intval');
+        if(empty($user_id)){
+            $user_id = $_SESSION['user_info']['id'];
+        }
+        $map['id'] = $user_id;
+        $map['state'] = array('in',array(1,2));
+        $user_info = $this->user_model->where($map)->find();
+        if(!empty($user_info)){
+            // 获取用户的所属组id
+            $gid = $this->auth_group_access_model->get_gid($user_id);
+            // 网站用户组信息
+            $map_group['id'] = array('in',$gid);
+            $group_info = $this->auth_group_model->where($map_group)->getField('id,title');
+            try{
+                $redis = new \Redis();
+                $res = $redis->connect('127.0.0.1',6379);
+                if(empty($res)){
+                    throw new \Exception('连接失败');
+                }
+            }catch(\Exception $e){
+                $msg = $e->getMessage();
+                $this->error($msg,U('admin/index/index'));
+                exit();
+            }
+            if(!empty($user_info['province'])){
+                $province = $redis->hGet('province',$user_info['province']);
+                if(!empty($user_info['city'])){
+                    $city = $redis->hGet('city:'.$user_info['province'],$user_info['city']);
+                    if(!empty($user_info['area'])){
+                        $area = $redis->hGet('area:'.$user_info['city'],$user_info['area']);
+                    }else{
+                        $area = '未知';
+                    }
+                }else{
+                    $city = '未知';
+                }
+            }else{
+                $province = '未知';
+            }
+            $this->assign('user_info',$user_info);
+            $this->assign('group_info',$group_info);
+            $this->assign('province',$province);
+            $this->assign('city',$city);
+            $this->assign('area',$area);
+            $this->display();
+        }else{
+            $this->error('您好，该用户不存在',U('/admin/auth/user'));
+        }
+    }
 }
