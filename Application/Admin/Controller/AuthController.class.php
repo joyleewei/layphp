@@ -368,6 +368,7 @@ class AuthController extends AdminbaseController{
     public function user(){
         // state: 1:启用 2:禁用 3:删除
         $map['state'] = array('in',array(1,2));
+        $map['id'] = array('neq',1);
         $list = $this->user_model->where($map)->getField('id,username,nickname,sex,state,phone,email');
         $this->assign('list',$list);
         $this->display();
@@ -554,22 +555,34 @@ class AuthController extends AdminbaseController{
     public function user_delete(){
         if(IS_POST){
             $id = I('post.id');
-            $map['id'] = array('in',$id);
-            $save_res = $this->user_model->where($map)->setField('state',3);
-            //file_put_contents('sql.log',$this->user_model->getLastSql()."\r\n\r\n",FILE_APPEND);
-            if(!empty($save_res)){
-                $map_access['uid'] = array('in',$id);
-                $this->auth_group_access_model->where($map_access)->delete();
-                //file_put_contents('sql.log',$this->auth_group_access_model->getLastSql()."\r\n\r\n",FILE_APPEND);
-                $res = array(
-                    'status'=>1,
-                    'msg'=>'您好，删除后台管理员成功'
-                );
-            }else{
+            if(empty($id)){
                 $res = array(
                     'status'=>0,
-                    'msg'=>'您好，操作失败，请稍后重试'
+                    'msg'=>'您好，请选择需要删除的管理员。'
                 );
+            }else{
+                if(is_array($id)){
+                    $ids = explode(',',$id['id']);
+                    $map['id'] = array('in',$ids);
+                    $map_access['uid'] = array('in',$ids);
+                }else{
+                    $map['id'] = $id;
+                    $map_access['uid'] = $id;
+                }
+                $save_res = $this->user_model->where($map)->setField('state',3);
+                if(!empty($save_res)){
+                    $this->auth_group_access_model->where($map_access)->delete();
+                    file_put_contents('sql.log',$this->auth_group_access_model->getLastSql()."\r\n\r\n",FILE_APPEND);
+                    $res = array(
+                        'status'=>1,
+                        'msg'=>'您好，删除后台管理员成功'
+                    );
+                }else{
+                    $res = array(
+                        'status'=>0,
+                        'msg'=>'您好，操作失败，请稍后重试'
+                    );
+                }
             }
             echo json_encode($res,true);
             exit();

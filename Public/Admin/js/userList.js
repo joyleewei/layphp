@@ -188,6 +188,8 @@ layui.config({
     $(".batchDel").click(function(){
         var $checked = $('.user_list tbody input[type="checkbox"][name="checked"]:checked');
         var $len = $checked.length;
+        console.log($checked);
+        console.log($len);
         if($len >0){
             layer.confirm('确定删除选中的后台管理员？',{icon:3, title:'提示信息'},function(index){
                 var index = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});
@@ -202,13 +204,15 @@ layui.config({
                     }
                 }
                 $json +='}';
+                console.log($json);
                 var $post = JSON.parse($json);
+                console.log($post);
                 var $url = '/admin/auth/user_delete.html?t='+new Date().getTime();
                 $.ajax({
                     'url':$url,
                     'type':'POST',
                     'dataType':'json',
-                    'data':{'id':$id},
+                    'data':{'id':$post},
                     'success':function(data){
                         if(data.status == 1){
                             layer.close(index);
