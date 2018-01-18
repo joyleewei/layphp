@@ -38,13 +38,13 @@
                 <div class="layui-input-inline">
                     <input type="password" name="password" disabled value="123456" required lay-verify="required" placeholder="请输入密码" class="layui-input layui-disabled" />
                 </div>
-                <div class="layui-form-mid layui-word-aux">初始密码为:123456</div>
+                <div class="layui-form-mid layui-word-aux">默认:123456</div>
             </div>
             <!-- 用户组 -->
             <!-- 权限管理还没有加进来 -->
             <div class="layui-form-item">
                 <label class="layui-form-label">用户组</label>
-                <div class="layui-input-block">
+                <div class="layui-input-inline">
                     <volist name="group" id="vo">
                         <input type="checkbox" name="rules[<{$key}>]" value="<{$key}>" title="<{$vo}>">
                     </volist>
@@ -53,21 +53,21 @@
             <!-- 邮箱 -->
             <div class="layui-form-item">
                 <label class="layui-form-label">用户邮箱</label>
-                <div class="layui-input-block">
+                <div class="layui-input-inline">
                     <input type="text" class="layui-input userEmail" name="email" required lay-verify="required|email" placeholder="请输入邮箱">
                 </div>
             </div>
             <!-- 手机号码 -->
             <div class="layui-form-item">
                 <label class="layui-form-label">手机号码</label>
-                <div class="layui-input-block">
+                <div class="layui-input-inline">
                     <input type="tel" value="" name="phone" placeholder="请输入手机号码" required lay-verify="required|phone" class="layui-input userPhone">
                 </div>
             </div>
             <!-- 出生年月 -->
             <div class="layui-form-item">
                 <label class="layui-form-label">出生年月</label>
-                <div class="layui-input-block">
+                <div class="layui-input-inline">
                     <input type="text" name="birth" value="" placeholder="请输入出生年月"  required lay-verify="required|date" onclick="layui.laydate({elem: this,max: laydate.now()})" class="layui-input userBirthday" />
                 </div>
             </div>
