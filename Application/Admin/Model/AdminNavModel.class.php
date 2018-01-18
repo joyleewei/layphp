@@ -42,7 +42,7 @@ class AdminNavModel extends Model{
      * @param  string $type tree获取树形结构 level获取层级结构
      * @return array       	结构数据
      */
-    public function getTreeData($type='tree',$order='',$map){
+    public function getTreeData($type='tree',$order='',$map=''){
         // 判断是否需要排序
         $map_data = array();
         if(!empty($map)){
