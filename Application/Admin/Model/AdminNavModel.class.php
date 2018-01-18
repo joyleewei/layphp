@@ -58,24 +58,23 @@ class AdminNavModel extends Model{
             $data=\Org\Nx\Data::tree($data,'name','id','pid');
         }elseif($type="level"){
             $data=\Org\Nx\Data::channelLevel($data,0,'&nbsp;','id');
-            // 显示有权限的菜单
-            /*
-            $auth=new \Think\Auth();
-            foreach ($data as $k => $v) {
-                if ($auth->check($v['mca'],$_SESSION['user']['id'])) {
-                    foreach ($v['_data'] as $m => $n) {
-                        if(!$auth->check($n['mca'],$_SESSION['user']['id'])){
-                            unset($data[$k]['_data'][$m]);
+            if($_SESSION['user_info']['id']!=1){
+                // 显示有权限的菜单
+                $auth=new \Think\Auth();
+                foreach ($data as $k => $v) {
+                    if ($auth->check($v['mca'],$_SESSION['user_info']['id'])) {
+                        foreach ($v['_data'] as $m => $n) {
+                            if(!$auth->check($n['mca'],$_SESSION['user_info']['id'])){
+                                unset($data[$k]['_data'][$m]);
+                            }
                         }
+                    }else{
+                        // 删除无权限的菜单
+                        unset($data[$k]);
                     }
-                }else{
-                    // 删除无权限的菜单
-                    unset($data[$k]);
                 }
             }
-            */
         }
         return $data;
     }
-
 }

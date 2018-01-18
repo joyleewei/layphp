@@ -51,7 +51,38 @@ class IndexController extends AdminbaseController {
             }
         }
         echo json_encode($arr,true);
-
     }
 
+    public function nav1(){
+        $nav_data=$this->nav_model->getTreeData('level','listorder,id');
+        $list = array();
+        $arr = array();
+        foreach($nav_data as $k=>$v){
+            if(!empty($v['_data'])){
+                $list['href'] = '';
+                $list['href'] = $v['mca'].'.html';
+                $list['title'] = $v['name'];
+                $list['icon'] = $v['icon'];
+                $list['spread'] = false;
+                $list['children'] = array();
+                foreach($v['_data'] as $key=>$value){
+                    $child['title'] = $value['name'];
+                    $child['icon'] = $value['icon'];
+                    $child['href'] = $value['mca'].'.html';
+                    $child['spread'] = 'false';
+                    array_push($list['children'],$child);
+                }
+                array_push($arr,$list);
+                unset($list);
+            }else{
+                $list['href'] = $v['mca'].'.html';
+                $list['title'] = $v['name'];
+                $list['icon'] = $v['icon'];
+                $list['spread'] = false;
+                array_push($arr,$list);
+                unset($list);
+            }
+        }
+        echo json_encode($arr,true);
+    }
 }
