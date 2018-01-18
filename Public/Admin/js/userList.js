@@ -153,46 +153,88 @@ layui.config({
     });
 
     // 删除后台用户
-    $("body").on("click",".users_del",function(){  //删除
+    $("body").on("click",".userDel_btn",function(){  //删除
         var _this = $(this);
-        layer.confirm('确定删除此用户？',{icon:3, title:'提示信息'},function(index){
-            //_this.parents("tr").remove();
-            for(var i=0;i<usersData.length;i++){
-                if(usersData[i].usersId == _this.attr("data-id")){
-                    usersData.splice(i,1);
-                    usersList(usersData);
+        layer.confirm('确定删除此后台管理员？',{icon:3, title:'提示信息'},function(index){
+            var $id = _this.attr('data-id');
+            var $url = '/admin/auth/user_delete.html?t='+new Date().getTime();
+            $.ajax({
+               'url':$url,
+                'type':'POST',
+                'dataType':'json',
+                'data':{'id':$id},
+                'success':function(data){
+                    if(data.status == 1){
+                        layer.close(index);
+                        layer.msg(data.msg,{'icon':1});
+                        parent.location.reload();
+                    }else{
+                        layer.close(index);
+                        layer.msg(data.msg,{'icon':2});
+                    }
+                },
+                'error':function(XMLHttpRequest, textStatus){
+                    var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                    xmlhttp.abort();
+                    console.log(textStatus);
+                    layer.close(index);
+                    layer.msg('接口发生错误，请稍后重试',{'icon':2});
                 }
-            }
-            layer.close(index);
+            });
         });
     });
+
     //批量删除后台用户
     $(".batchDel").click(function(){
-        var $checkbox = $('.users_list tbody input[type="checkbox"][name="checked"]');
-        var $checked = $('.users_list tbody input[type="checkbox"][name="checked"]:checked');
-        if($checkbox.is(":checked")){
-            layer.confirm('确定删除选中的信息？',{icon:3, title:'提示信息'},function(index){
+        var $checked = $('.user_list tbody input[type="checkbox"][name="checked"]:checked');
+        var $len = $checked.length;
+        if($len >0){
+            layer.confirm('确定删除选中的后台管理员？',{icon:3, title:'提示信息'},function(index){
                 var index = layer.msg('删除中，请稍候',{icon: 16,time:false,shade:0.8});
-                setTimeout(function(){
-                    //删除数据
-                    for(var j=0;j<$checked.length;j++){
-                        for(var i=0;i<usersData.length;i++){
-                            if(usersData[i].newsId == $checked.eq(j).parents("tr").find(".news_del").attr("data-id")){
-                                usersData.splice(i,1);
-                                usersList(usersData);
-                            }
-                        }
+                // 发起ajax请求
+                var $json = '{"id":"';
+                for(var i=0;i<$len;i++){
+                    $id = $checked.eq(i).attr('data-id');
+                    if(i == $len -1){
+                        $json += $id+'"';
+                    }else{
+                        $json += $id +',';
                     }
-                    $('.users_list thead input[type="checkbox"]').prop("checked",false);
-                    form.render();
-                    layer.close(index);
-                    layer.msg("删除成功");
-                },2000);
+                }
+                $json +='}';
+                var $post = JSON.parse($json);
+                var $url = '/admin/auth/user_delete.html?t='+new Date().getTime();
+                $.ajax({
+                    'url':$url,
+                    'type':'POST',
+                    'dataType':'json',
+                    'data':{'id':$id},
+                    'success':function(data){
+                        if(data.status == 1){
+                            layer.close(index);
+                            layer.msg(data.msg,{'icon':1});
+                            parent.location.reload();
+                        }else{
+                            layer.close(index);
+                            layer.msg(data.msg,{'icon':2});
+                        }
+                    },
+                    'error':function(XMLHttpRequest, textStatus){
+                        var xmlhttp = window.XMLHttpRequest ? new window.XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHttp");
+                        xmlhttp.abort();
+                        console.log(textStatus);
+                        layer.close(index);
+                        layer.msg('接口发生错误，请稍后重试',{'icon':2});
+                    }
+                });
+                return false;
             })
         }else{
-            layer.msg("请选择需要删除的文章");
+            layer.msg("请选择需要删除的后台管理员");
         }
-    })
+
+    });
+
     // 图片上传
     layui.upload({
         'url' : "/api/upload/image.html?t="+new Date().getTime(),

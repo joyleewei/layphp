@@ -552,7 +552,30 @@ class AuthController extends AdminbaseController{
 
     // 删除管理员
     public function user_delete(){
-
+        if(IS_POST){
+            $id = I('post.id');
+            $map['id'] = array('in',$id);
+            $save_res = $this->user_model->where($map)->setField('state',3);
+            //file_put_contents('sql.log',$this->user_model->getLastSql()."\r\n\r\n",FILE_APPEND);
+            if(!empty($save_res)){
+                $map_access['uid'] = array('in',$id);
+                $this->auth_group_access_model->where($map_access)->delete();
+                //file_put_contents('sql.log',$this->auth_group_access_model->getLastSql()."\r\n\r\n",FILE_APPEND);
+                $res = array(
+                    'status'=>1,
+                    'msg'=>'您好，删除后台管理员成功'
+                );
+            }else{
+                $res = array(
+                    'status'=>0,
+                    'msg'=>'您好，操作失败，请稍后重试'
+                );
+            }
+            echo json_encode($res,true);
+            exit();
+        }else{
+            $this->error('您好，操作失败，请确认后重试',U('/admin/auth/user'));
+        }
     }
 
     // 查看管理员信息
