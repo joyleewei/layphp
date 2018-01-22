@@ -1,0 +1,8 @@
+UPDATE `db_user` SET `state`='3' WHERE `id` IN ('2')
+
+SHOW COLUMNS FROM `db_auth_group_access`
+
+UPDATE `db_user` SET `state`='3' WHERE `id` IN ('2')
+
+DELETE FROM `db_auth_group_access` WHERE `uid` IN ('2')
+
