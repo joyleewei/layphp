@@ -12,11 +12,13 @@ class AdminbaseController extends Controller{
                 exit();
             }
         }else{
-            $auth=new \Think\Auth();
-            $rule_name='/'.MODULE_NAME.'/'.CONTROLLER_NAME.'/'.ACTION_NAME;
-            $result=$auth->check($rule_name,$_SESSION['user_info']['id']);
-            if(!$result){
-                $this->error('您没有权限访问',U('/admin/index/index'));
+            if($_SESSION['user_info']['id']!=1){
+                $auth=new \Think\Auth();
+                $rule_name='/'.MODULE_NAME.'/'.CONTROLLER_NAME.'/'.ACTION_NAME;
+                $result=$auth->check($rule_name,$_SESSION['user_info']['id']);
+                if(!$result){
+                    $this->error('您没有权限访问',U('/admin/index/index'));
+                }
             }
         }
     }

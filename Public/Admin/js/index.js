@@ -12,6 +12,7 @@ layui.config({
 			url :url //获取菜单json地址
 		});
 
+    /*
 	//更换皮肤
 	function skins(){
 		var skin = window.sessionStorage.getItem("skin");
@@ -25,7 +26,6 @@ layui.config({
 			}
 		}
 	}
-	/*
 	skins();
 	$(".changeSkin").click(function(){
 		layer.open({

@@ -10,10 +10,13 @@ class NavController extends AdminbaseController{
 
     // 菜单显示[暂时只做二级菜单，不做无限级菜单]
     public function index(){
-        $list=D('AdminNav')->getTreeData('tree','listorder,id','');
+        if(IS_AJAX){
 
-        $this->assign('list',$list);
-        $this->display();
+        }else{
+            $list=D('AdminNav')->getTreeData('tree','listorder,id','');
+            $this->assign('list',$list);
+            $this->display();
+        }
     }
 
     public function add(){
@@ -103,8 +106,8 @@ class NavController extends AdminbaseController{
                     $map_nav['type'] = 1;
                     $map_nav['pid'] =0;
                     $first_nav = $this->nav_model->where($map_nav)->getField('id,name');
-                    $this->assign('first_nav',$first_nav);
 
+                    $this->assign('first_nav',$first_nav);
                     $this->assign('nav_info',$nav_info);
                     $this->display();
                 }else{
