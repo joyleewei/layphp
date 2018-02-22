@@ -11,8 +11,11 @@
         <meta name="format-detection" content="telephone=no">
         <link rel="icon" href="/favicon.ico">
         <link rel="stylesheet" href="__PUBLIC__/static/layui/css/layui.css" media="all" />
+        <link rel="stylesheet" href="__PUBLIC__/Admin/treegrid/css/jquery.treegrid.css" media="all" />
         <script type="text/javascript" src="__PUBLIC__/static/layui/layui.js"></script>
         <script type="text/javascript" src="__PUBLIC__/Admin/js/navList.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/Admin/js/jquery.min.js"></script>
+        <script type="text/javascript" src="__PUBLIC__/Admin/treegrid/js/jquery.treegrid.js"></script>
     </head>
     <body class="childrenBody">
         <blockquote class="layui-elem-quote">
@@ -22,9 +25,9 @@
             </div>
         </blockquote>
         <div class="layui-form news_list" lay-filter="nav">
-            <table class="layui-table" lay-even lay-size="sm">
+            <table class="layui-table tree" lay-even lay-size="sm">
                 <colgroup>
-                    <col width="80">
+                    <col width="140px">
                     <col width="50">
                     <col width="18%">
                     <col>
@@ -32,7 +35,7 @@
                 </colgroup>
                 <thead>
                 <tr>
-                    <th style="text-align:center;">排序</th>
+                    <th style="text-align:left;">排序</th>
                     <th >ID</th>
                     <th>菜单名称</th>
                     <th>应用路径</th>
@@ -41,9 +44,9 @@
                 </thead>
                 <tbody class="news_content">
                 <volist name="list" id="vo">
-                    <tr>
-                        <td style="text-align:center;">
-                            <input style="text-align:center;padding:0px;" type="text" class="layui-input layui-sort" data-id="<{$vo['id']}>" value="<{$vo['listorder']}>">
+                    <tr  class='treegrid-<{$vo.id}> <if condition="$vo.pid neq 0" > treegrid-parent-<{$vo.pid}></if> ' >
+                        <td style="text-align:left;">
+                            <input style="text-align:center;padding:0px;width:50px;display:inline-block;" type="text" class="layui-input layui-sort" data-id="<{$vo['id']}>" value="<{$vo['listorder']}>">
                         </td>
                         <td style="text-align:center;"><{$vo['id']}></td>
                         <td>
@@ -66,7 +69,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
-                    <th style="text-align:center;">排序</th>
+                    <th style="text-align:left;">排序</th>
                     <th >ID</th>
                     <th>菜单名称</th>
                     <th>应用路径</th>

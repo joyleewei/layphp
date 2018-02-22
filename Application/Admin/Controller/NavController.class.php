@@ -11,7 +11,6 @@ class NavController extends AdminbaseController{
     // 菜单显示[暂时只做二级菜单，不做无限级菜单]
     public function index(){
         $list=D('AdminNav')->getTreeData('tree','listorder,id','');
-
         $this->assign('list',$list);
         $this->display();
     }

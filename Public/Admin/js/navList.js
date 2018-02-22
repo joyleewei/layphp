@@ -4,7 +4,8 @@ layui.config({
     var form = layui.form(),
         layer = parent.layer === undefined ? layui.layer : parent.layer,
         $ = layui.jquery;
-
+    // 树形菜单折叠
+    $('.tree').treegrid({initialState: 'collapsed'});
     //添加菜单 添加子菜单 弹窗
     //改变窗口大小时，重置弹窗的高度，防止超出可视区域（如F12调出debug的操作）
     $(".navAdd_btn").click(function(){
