@@ -33,6 +33,35 @@ final class Data
         }
         return $arr;
     }
+    // \Org\Nx\Data::channelNav($data,0,'&nbsp;','id');
+    static public function channelNav($data, $pid = 0,$fieldPri = 'cid', $fieldPid = 'pid', $level = 1)
+    {
+        if (empty($data)) {
+            return array();
+        }
+        $arr = array();
+        foreach ($data as $v) {
+            $unit = array();
+            if ($v[$fieldPid] == $pid) {
+                $unit['id'] = $v['id'];
+                $unit['pid'] = $v['pid'];
+                $unit['title'] = $v['name'];
+                // font icon  url 都需要重新写
+                $unit['font'] = 'larry-icon';
+                $unit['icon'] = 'larry-shouye4';
+                $unit['url'] = $v['img'];
+                $unit['spread'] = false;
+                $low_data =  self::channelNav($data, $v[$fieldPri], $fieldPri, $fieldPid, $level + 1);
+                if(!empty($low_data)){
+                    $unit['children'] = $low_data;
+                }
+                array_push($arr,$unit);
+                unset($unit);
+            }
+        }
+        return $arr;
+    }
+
 
     /**
      * 获得所有子栏目
